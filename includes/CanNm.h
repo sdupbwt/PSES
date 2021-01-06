@@ -25,12 +25,50 @@
 /*====================================================================================================================*\
     Makra globalne
 \*====================================================================================================================*/
-
+#define CANNM_E_NO_INIT	0x01u /** @req CANNM316 */
 /*====================================================================================================================*\
     Typy globalne
 \*====================================================================================================================*/
+typedef enum {
+    CANNM_PDU_BYTE_0 = 0x00,
+    CANNM_PDU_BYTE_1 = 0x01,
+    CANNM_PDU_OFF = 0xFF
+} CanNm_PduPositionType;
+
 typedef struct {
-  
+	boolean	CanNmActiveWakeupBitEnabled;
+	boolean CanNmAllNmMessagesKeepAwake;
+	boolean	CanNmBusLoadReductionActive;
+	uint8	CanNmCarWakeUpBitPosition;
+	uint8	CanNmCarWakeUpBytePosition;
+	boolean	CanNmCarWakeUpFilterEnabled;
+	uint8	CanNmCarWakeUpFilterNodeId;
+	boolean	CanNmCarWakeUpRxEnabled;
+	boolean CanNmDynamicPncToChannelMappingEnabled;
+	uint32	CanNmImmediateNmCycleTime;
+	uint8	CanNmImmediateNmTransmissions;
+	uint32	CanNmMsgCycleOffset;
+	uint32	CanNmMsgCycleTime;
+	uint32	CanNmMsgReducedTime;
+	uint32	CanNmMsgTimeoutTime;
+	boolean	CanNmNodeDetectionEnabled;
+	uint8	CanNmNodeId;
+	boolean	CanNmNodeIdEnabled;
+	CanNm_PduPositionType	CanNmPduCbvPosition;
+	CanNm_PduPositionType	CanNmPduNidPosition;
+	boolean	CanNmPnEnabled;
+	boolean	CanNmPnEraCalcEnabled;
+	boolean	CanNmPnHandleMultipleNetworkRequests;
+	uint32	CanNmRemoteSleepIndTime;
+	uint32	CanNmRepeatMessageTime;
+	boolean	CanNmRepeatMsgIndEnabled;
+	boolean	CanNmStayInPbsEnabled;
+	boolean	CanNmSynchronizedPncShutdownEnabled;
+	uint32	CanNmTimeoutTime;
+	uint32	CanNmWaitBusSleepTime;
+//	Symbolic name reference to [ ComMChannel ]	CanNmComMNetworkHandleRef;
+//	Reference to [ Pdu ]	CanNmPnEraRxNSduRef;
+
 } CanNm_ConfigType;
 
 /*====================================================================================================================*\
@@ -40,7 +78,6 @@ typedef struct {
 /*====================================================================================================================*\
     Deklaracje funkcji globalnych
 \*====================================================================================================================*/
-void Calc_Reset(void);
 
 /*====================================================================================================================*\
     Kod globalnych funkcji inline i makr funkcyjnych

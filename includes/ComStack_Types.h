@@ -38,6 +38,9 @@
 /*------------------------------------------------------------------------------
  * Typedefs
  *----------------------------------------------------------------------------*/
+typedef uint8 NetworkHandleType;
+typedef uint8 PNCHandleType;
+
 typedef uint32 PduIdType;
 typedef uint16 PduLengthType;
 
