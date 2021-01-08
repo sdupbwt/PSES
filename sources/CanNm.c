@@ -28,12 +28,16 @@ typedef struct {
 	Nm_ModeType Mode; /**< @req CANNM092 */
 	Nm_StateType State; /**< @req CANNM094 */
 	boolean Requested;
-} CanNm_Internal_ChannelType;
+} CanNm_InternalType;
 
 /*====================================================================================================================*\
     Zmienne globalne
  \*====================================================================================================================*/
-CanNm_InitStatusType InitStatus;
+CanNm_InitStatusType InitStatus = CANNM_STATUS_UNINIT;
+
+CanNm_InternalType CanNm_Internal;
+
+static const CanNm_ConfigType* CanNm_ConfigPtr;
 /*====================================================================================================================*\
     Zmienne lokalne (statyczne)
  \*====================================================================================================================*/
@@ -55,8 +59,21 @@ CanNm_InitStatusType InitStatus;
 
 
  */
+/** must be called directly after canIf /** @req CANNM253 */
 void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr) {
 
+	CanNm_ConfigPtr = cannmConfigPtr;  /**< @req CANNM060 */
+	CanNm_InternalType* ModuleInternal = &CanNm_Internal;
+
+	ModuleInternal->Mode = NM_MODE_BUS_SLEEP;    /** @req CANNM144 */
+	ModuleInternal->State = NM_STATE_BUS_SLEEP;  /** @req CANNM141 */
+	ModuleInternal->Requested = FALSE;           /** @req CANNM143 */ /*released*/
+
+//	CanNmBusLoadReductionActive = FALSE; /** @req CANNM023 */
+
+//	CanNm_ConfigPtr
+
+	InitStatus = CANNM_STATUS_INIT;
 }
 
 /**
