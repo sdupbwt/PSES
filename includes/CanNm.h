@@ -46,7 +46,7 @@ typedef struct {
 	boolean	CanNmCarWakeUpRxEnabled;
 	boolean CanNmDynamicPncToChannelMappingEnabled;
 	uint32	CanNmImmediateNmCycleTime;
-	uint8	CanNmImmediateNmTransmissions;
+	uint8	CanNmImmediateNmTransmissions; // =0
 	uint32	CanNmMsgCycleOffset;
 	uint32	CanNmMsgCycleTime;
 	uint32	CanNmMsgReducedTime;
