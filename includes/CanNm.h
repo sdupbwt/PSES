@@ -66,6 +66,7 @@ typedef struct {
 	boolean	CanNmSynchronizedPncShutdownEnabled;
 	uint32	CanNmTimeoutTime;
 	uint32	CanNmWaitBusSleepTime;
+	NetworkHandleType NmNetworkHandle;
 //	Symbolic name reference to [ ComMChannel ]	CanNmComMNetworkHandleRef;
 //	Reference to [ Pdu ]	CanNmPnEraRxNSduRef;
 

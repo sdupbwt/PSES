@@ -35,6 +35,8 @@ typedef struct {
     PduLengthType PduLength;
     Std_VersionInfoType VersionInfo;
     uint32 TimeoutTimeLeft;
+    uint32 RepeatMessageTimeLeft;
+    uint32 MessageCycleTimeLeft;
 } CanNm_InternalType;
 
 /*====================================================================================================================*\
@@ -525,7 +527,59 @@ void CanNm_TxConfirmation(PduIdType TxPduId, Std_ReturnType) {
 
 
  */
-void CanNm_RxIndication(PduIdType RxPduId, const PduInfoType* PduInfoPtr);
+void CanNm_RxIndication(PduIdType RxPduId, const PduInfoType* PduInfoPtr){
+
+	if (InitStatus == CANNM_STATUS_INIT) { /**< @req CANNM277 */
+
+		//CanNm_ConfigPtr
+		CanNm_InternalType* ModuleInternal = &CanNm_Internal;
+
+		memcpy(ModuleInternal->RxMessageSdu, PduInfoPtr->SduDataPtr, PduInfoPtr->SduLength);  /**< @req CANNM035 */
+
+		boolean repeatMessageBitIndication = FALSE;
+		if (CanNm_ConfigPtr->CanNmPduCbvPosition != CANNM_PDU_OFF) {
+			uint8 cbv = ModuleInternal->RxMessageSdu[CanNm_ConfigPtr->CanNmPduCbvPosition];
+			repeatMessageBitIndication = cbv & CANNM_CBV_REPEAT_MESSAGE_REQUEST;
+		}
+
+		if (ModuleInternal->Mode == NM_MODE_BUS_SLEEP) {
+			Nm_NetworkStartIndication(CanNm_ConfigPtr->NmNetworkHandle);  /**< @req CANNM127 */
+
+		} else if (ModuleInternal->Mode == NM_MODE_PREPARE_BUS_SLEEP) {
+			ModuleInternal->Mode = NM_MODE_NETWORK;		/**< @req CANNM124 */
+			ModuleInternal->State = NM_STATE_REPEAT_MESSAGE;
+			ModuleInternal->TimeoutTimeLeft = CanNm_ConfigPtr->CanNmMsgTimeoutTime;  /**< @req CANNM096 */
+			ModuleInternal->RepeatMessageTimeLeft = CanNm_ConfigPtr->CanNmRepeatMessageTime;
+			ModuleInternal->MessageCycleTimeLeft = CanNm_ConfigPtr->CanNmMsgCycleTime - CanNm_ConfigPtr->CanNmMsgCycleOffset;  /**< @req CANNM100 */
+			// Notify 'Network Mode'
+			Nm_NetworkMode(CanNm_ConfigPtr->NmNetworkHandle);  /**< @req CANNM097 */
+
+		} else if (ModuleInternal->Mode == NM_MODE_NETWORK) {
+			ModuleInternal->TimeoutTimeLeft = CanNm_ConfigPtr->CanNmMsgTimeoutTime;  /**< @req CANNM098 */
+			if (repeatMessageBitIndication) {
+				if (ModuleInternal->State == NM_STATE_READY_SLEEP) {
+					ModuleInternal->Mode = NM_MODE_NETWORK;
+					ModuleInternal->State = NM_STATE_REPEAT_MESSAGE;		/**< @req CANNM111 */
+					ModuleInternal->RepeatMessageTimeLeft = CanNm_ConfigPtr->CanNmRepeatMessageTime;
+					ModuleInternal->MessageCycleTimeLeft = CanNm_ConfigPtr->CanNmMsgCycleTime - CanNm_ConfigPtr->CanNmMsgCycleOffset;  /**< @req CANNM100 */
+
+				} else if (ModuleInternal->State == NM_STATE_NORMAL_OPERATION) {
+					ModuleInternal->Mode = NM_MODE_NETWORK;
+					ModuleInternal->State = NM_STATE_REPEAT_MESSAGE;		/**< @req CANNM119 */
+					ModuleInternal->RepeatMessageTimeLeft = CanNm_ConfigPtr->CanNmRepeatMessageTime;
+					ModuleInternal->MessageCycleTimeLeft = CanNm_ConfigPtr->CanNmMsgCycleTime - CanNm_ConfigPtr->CanNmMsgCycleOffset;  /**< @req CANNM100 */
+				} else {
+					//Nothing to be done
+				}
+			}
+		} else {
+			//Nothing to be done
+		}
+
+
+	} else {
+	}
+}
 
 /**
  @brief
