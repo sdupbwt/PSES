@@ -87,7 +87,7 @@ void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr) {
 /**
  @brief DeInit
 
-TODO to co on mówi³
+TODO to co on mï¿½wiï¿½
  */
 void CanNm_DeInit(void){
 
@@ -150,7 +150,7 @@ Std_ReturnType CanNm_NetworkRequest(NetworkHandleType nmChannelHandle){
 
 		ModuleInternal->Requested = TRUE;	/**< @req CANNM255 */ /**< @req CANNM104 */
 
-		if(ModuleInternal->Mode == NM_MODE_BUS_SLEEP || ModuleInternal->State == NM_MODE_PREPARE_BUS_SLEEP)
+		if(ModuleInternal->Mode == NM_MODE_BUS_SLEEP || ModuleInternal->Mode == NM_MODE_PREPARE_BUS_SLEEP)
 		{
 			ModuleInternal->Mode = NM_MODE_NETWORK;
 			ModuleInternal->State = NM_STATE_REPEAT_MESSAGE;
@@ -163,9 +163,9 @@ Std_ReturnType CanNm_NetworkRequest(NetworkHandleType nmChannelHandle){
 	}
 	else{
 		 ret_val = E_NOT_OK;
+		}
+		return ret_val;
 	}
-	return ret_val;
-}
 
 
 /**
@@ -294,7 +294,6 @@ Std_ReturnType CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8*
 			ret_val = E_OK;
 		}
 
-		ret_val = E_OK;
 	} else {
 		ret_val = E_NOT_OK;
 	}
@@ -338,7 +337,7 @@ Std_ReturnType CanNm_RepeatMessageRequest(NetworkHandleType nmChannelHandle){
 				&& ModuleInternal->Mode != NM_MODE_PREPARE_BUS_SLEEP
 				&& ModuleInternal->Mode != NM_MODE_BUS_SLEEP) { /**< @req CANNM137 */
 
-			if (ModuleInternal->State == NM_STATE_NORMAL_OPERATION || ModuleInternal->Mode == NM_STATE_READY_SLEEP) {
+			if (ModuleInternal->State == NM_STATE_NORMAL_OPERATION || ModuleInternal->State == NM_STATE_READY_SLEEP) {
 
 				ModuleInternal->Mode = NM_MODE_NETWORK;
 				ModuleInternal->State = NM_STATE_REPEAT_MESSAGE; /**< @req CANNM120 *//**< @req CANNM112 */
@@ -395,7 +394,7 @@ Std_ReturnType CanNm_GetState(NetworkHandleType nmChannelHandle, Nm_StateType* n
 		CanNm_InternalType* ModuleInternal = &CanNm_Internal;
 
 		*nmStatePtr = ModuleInternal->State;		/**< @req CANNM091 */
-		*nmStatePtr = ModuleInternal->Mode;
+		*nmModePtr = ModuleInternal->Mode;
 
 		ret_val = E_OK;
 	} else {
@@ -562,7 +561,7 @@ void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle);
 Std_ReturnType CanNm_TriggerTransmit(PduIdType TxPduId, PduInfoType* PduInfoPtr){
 	Std_ReturnType ret_val = E_NOT_OK;
 	CanNm_InternalType* ModuleInternal = &CanNm_Internal;
-	uint8 TxSdu = ModuleInternal->TxMessageSdu;
+	//uint8 TxSdu = ModuleInternal->TxMessageSdu;
 
 	if(sizeof(ModuleInternal->TxMessageSdu) == PduInfoPtr->SduLength){
 		memcpy(ModuleInternal->TxMessageSdu, PduInfoPtr->SduDataPtr, PduInfoPtr->SduLength);
