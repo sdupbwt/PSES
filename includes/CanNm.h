@@ -126,10 +126,6 @@ Std_ReturnType CanNm_CheckRemoteSleepIndication (NetworkHandleType nmChannelHand
 
 Std_ReturnType CanNm_SetSleepReadyBit (NetworkHandleType nmChannelHandle, boolean nmSleepReadyBit);
 
-Std_ReturnType CanNm_PnLearningRequest (NetworkHandleType nmChannelHandle);
-
-Std_ReturnType CanNm_RequestSynchronizedPncShutdown (NetworkHandleType nmChannelHandle, PNCHandleType pncId);
-
 void CanNm_TxConfirmation (PduIdType TxPduId, Std_ReturnType result);
 
 void CanNm_RxIndication (PduIdType RxPduId, const PduInfoType* PduInfoPtr);
