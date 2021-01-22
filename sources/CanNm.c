@@ -11,8 +11,8 @@
 /*====================================================================================================================*\
     Załączenie nagłówków
  \*====================================================================================================================*/
-#include "CanNm.h"
-#include "NmStack_Types.h"
+#include "../includes/CanNm.h"
+#include "../includes/NmStack_Types.h"
 #include <string.h>
 /*====================================================================================================================*\
     Makra lokalne
@@ -26,18 +26,6 @@ typedef enum {
 	CANNM_STATUS_INIT, CANNM_STATUS_UNINIT
 } CanNm_InitStatusType;
 
-typedef struct {
-	Nm_ModeType Mode; /**< @req CANNM092 */
-	Nm_StateType State; /**< @req CANNM094 */
-	boolean Requested;
-    uint8 TxMessageSdu[8];
-    uint8 RxMessageSdu[8];
-    PduLengthType PduLength;
-    Std_VersionInfoType VersionInfo;
-    uint32 TimeoutTimeLeft;
-    uint32 RepeatMessageTimeLeft;
-    uint32 MessageCycleTimeLeft;
-} CanNm_InternalType;
 
 /*====================================================================================================================*\
     Zmienne globalne
@@ -88,7 +76,7 @@ void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr) {
 
 	/** @req CANNM025 */ //TODO CanNmComUserDataSupport is enabled
 	uint8* destUserData = CanNm_Internal_GetUserDataPtr(CanNm_ConfigPtr, ModuleInternal->TxMessageSdu);
-	uint8 userDataLength = CanNm_Internal_GetUserDataLength(CanNm_ConfigPtr);
+	uint8 userDataLength = CanNm_Internal_GetUserDataLength(CanNm_ConfigPtr, ModuleInternal);
 	memset(destUserData, 0xFF, userDataLength);
 
 	 /** @req CANNM060 */
@@ -134,7 +122,7 @@ Std_ReturnType CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle){
 			ModuleInternal->RepeatMessageTimeLeft = CanNm_ConfigPtr->CanNmRepeatMessageTime; 	/**< @req CANNM102 */
 //			ModuleInternal->MessageCycleTimeLeft = CanNm_ConfigPtr->MessageCycleOffsetTime;
 			// Notify 'Network Mode'
-			Nm_NetworkMode(nmChannelHandle); /**< @req CANNM097 */
+			Nm_NetworkMode(nmChannelHandle); /**< @req 	 */
 
 			ret_val = E_OK;
 		} else {
@@ -163,10 +151,17 @@ Std_ReturnType CanNm_NetworkRequest(NetworkHandleType nmChannelHandle){
 		ModuleInternal->Requested = TRUE;	/**< @req CANNM255 */ /**< @req CANNM104 */
 
 		if(ModuleInternal->Mode == NM_MODE_BUS_SLEEP || ModuleInternal->State == NM_MODE_PREPARE_BUS_SLEEP)
+		{
 			ModuleInternal->Mode = NM_MODE_NETWORK;
 			ModuleInternal->State = NM_STATE_REPEAT_MESSAGE;
 			ModuleInternal->TxMessageSdu[CanNm_ConfigPtr->CanNmPduCbvPosition] |= CANNM_CBV_ACTIVE_WAKEUP_BIT;	/**< @req CANNM401 */
-	}else{
+			ret_val = E_OK;
+		}
+		else {
+			ret_val = E_NOT_OK;
+		}
+	}
+	else{
 		 ret_val = E_NOT_OK;
 	}
 	return ret_val;
@@ -210,6 +205,7 @@ Std_ReturnType CanNm_NetworkRelease(NetworkHandleType nmChannelHandle){
 CANNM_COM_CONTROL_ENABLED = STD_OFF
 
  */
+
 Std_ReturnType CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
 
 /**
@@ -232,7 +228,7 @@ Std_ReturnType CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8*
 		CanNm_InternalType* ModuleInternal = &CanNm_Internal;
 
 		uint8* destUserData = CanNm_Internal_GetUserDataPtr(CanNm_ConfigPtr, ModuleInternal->TxMessageSdu);
-		uint8 userDataLength = CanNm_Internal_GetUserDataLength(CanNm_ConfigPtr);
+		uint8 userDataLength = CanNm_Internal_GetUserDataLength(CanNm_ConfigPtr, ModuleInternal);
 
 		memcpy(destUserData, nmUserDataPtr, userDataLength);	/**< @req CANNM159 */
 		ret_val = E_OK;
@@ -257,7 +253,7 @@ Std_ReturnType CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8* nmUse
 		CanNm_InternalType* ModuleInternal = &CanNm_Internal;
 
 		uint8* sourceUserData = CanNm_Internal_GetUserDataPtr(CanNm_ConfigPtr, ModuleInternal->RxMessageSdu);
-		uint8 userDataLength = CanNm_Internal_GetUserDataLength(CanNm_ConfigPtr);
+		uint8 userDataLength = CanNm_Internal_GetUserDataLength(CanNm_ConfigPtr, ModuleInternal);
 
 		memcpy(nmUserDataPtr, sourceUserData, userDataLength);	/**< @req CANNM160 */
 
@@ -292,7 +288,8 @@ Std_ReturnType CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8*
 
 		if (CanNm_ConfigPtr->CanNmPduNidPosition == CANNM_PDU_OFF) {
 			ret_val = E_NOT_OK;
-		} else {
+		}
+		else {
 			*nmNodeIdPtr = ModuleInternal->RxMessageSdu[CanNm_ConfigPtr->CanNmPduNidPosition];	/**< @req CANNM132 */
 			ret_val = E_OK;
 		}
@@ -475,7 +472,7 @@ Std_ReturnType CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle, boolean
 
 
  */
-void CanNm_TxConfirmation(PduIdType TxPduId, Std_ReturnType) {
+void CanNm_TxConfirmation(PduIdType TxPduId, Std_ReturnType result) {
 
 	if (InitStatus == CANNM_STATUS_INIT) { /**< @req CANNM283 */
 
@@ -624,6 +621,17 @@ static inline PduLengthType CanNm_Internal_GetUserDataLength( const CanNm_Config
     PduLengthType userDataOffset = CanNm_Internal_GetUserDataOffset(InputConf);
     return InternalConf->PduLength - userDataOffset;
 }
+
+
+void Nm_NetworkMode(NetworkHandleType nmChannelHandle)
+{
+
+};
+
+void Nm_NetworkStartIndication(NetworkHandleType NmNetworkHandle)
+{
+
+};
 
 //static inline void CanNm_Internal_PrepareBusSleep_to_RepeatMessage( const CanNm_ConfigType* InputConf, CanNm_InternalType* InternalConf ) {
 //	InternalConf->Mode = NM_MODE_NETWORK;

@@ -1,0 +1,467 @@
+        -:    0:Source:UT_CanNM.c
+        -:    0:Graph:.\UT_CanNM.gcno
+        -:    0:Data:.\UT_CanNM.gcda
+        -:    0:Runs:5
+        -:    0:Programs:1
+        -:    1:/** ==================================================================================================================*\
+        -:    2:  @file UT_CanNM.c
+        -:    3:
+        -:    4:  @brief Testy jednostkowe do CAN Network Management
+        -:    5:\*====================================================================================================================*/
+        -:    6:#include "../includes/Std_Types.h"
+        -:    7:#include "../includes/acutest.h"
+        -:    8:#include "../includes/fff.h"
+        -:    9:
+        -:   10:#include "../sources/CanNM.c"
+        -:   11:
+        -:   12:/*====================================================================================================================*\
+        -:   13:    Makra lokalne
+        -:   14:\*====================================================================================================================*/
+        -:   15:#define CANNM_CHANNEL_COUNT 1
+        -:   16:#define CANNM_RXPDU_COUNT   1
+        -:   17:#define CANNM_SDU_LENGTH    8
+        -:   18:
+        -:   19:/*====================================================================================================================*\
+        -:   20:    Typy lokalne
+        -:   21:\*====================================================================================================================*/
+        -:   22:
+        -:   23:/*====================================================================================================================*\
+        -:   24:    Zmienne globalne
+        -:   25:\*====================================================================================================================*/
+        -:   26:
+        -:   27:/*====================================================================================================================*\
+        -:   28:    Zmienne lokalne (statyczne)
+        -:   29:\*====================================================================================================================*/
+        -:   30:
+        -:   31:
+        -:   32:static const CanNm_ConfigType cannmConfigPtr = {
+        -:   33:  //.CanNmActiveWakeupBitEnabled = ,
+        -:   34:	//.CanNmAllNmMessagesKeepAwake = ,
+        -:   35:	//.CanNmBusLoadReductionActive = ,
+        -:   36:	//.CanNmCarWakeUpBitPosition = ,
+        -:   37:	//.CanNmCarWakeUpBytePosition = ,
+        -:   38:	//.CanNmCarWakeUpFilterEnabled = ,
+        -:   39:	//.CanNmCarWakeUpFilterNodeId = ,
+        -:   40:	//.CanNmCarWakeUpRxEnabled = ,
+        -:   41:	//.CanNmDynamicPncToChannelMappingEnabled = ,
+        -:   42:	//.CanNmImmediateNmCycleTime = ,
+        -:   43:	//.CanNmImmediateNmTransmissions = ,
+        -:   44:	//.CanNmMsgCycleOffset = ,
+        -:   45:	//.CanNmMsgCycleTime = ,
+        -:   46:	//.CanNmMsgReducedTime = ,
+        -:   47:	//.CanNmMsgTimeoutTime = ,
+        -:   48:	//.CanNmNodeDetectionEnabled = ,
+        -:   49:	//.CanNmNodeId = ,
+        -:   50:	//.CanNmNodeIdEnabled = ,
+        -:   51:	//.CanNmPduCbvPosition = ,
+        -:   52:	//.CanNmPduNidPosition = ,
+        -:   53:	//.CanNmPnEnabled = ,
+        -:   54:	//.CanNmPnEraCalcEnabled = ,
+        -:   55:	//.CanNmPnHandleMultipleNetworkRequests = ,
+        -:   56:	//.CanNmRemoteSleepIndTime = ,
+        -:   57:	//.CanNmRepeatMessageTime = ,
+        -:   58:	//.CanNmRepeatMsgIndEnabled = ,
+        -:   59:	//.CanNmStayInPbsEnabled = ,
+        -:   60:	//.CanNmSynchronizedPncShutdownEnabled = ,
+        -:   61:	//.CanNmTimeoutTime = ,
+        -:   62:	//.CanNmWaitBusSleepTime = ,
+        -:   63:	//.NmNetworkHandle = ,
+        -:   64:};
+        -:   65:
+        -:   66:NetworkHandleType nmChannelHandle = 0;
+        -:   67://const uint8* nmUserDataPtr = 
+        -:   68:
+        -:   69://DEFINE_FFF_GLOBALS;
+        -:   70:
+        -:   71://FAKE_VOID_FUNC(Lib_Calc_MemS, sint32);
+        -:   72://FAKE_VALUE_FUNC(sint32, Lib_Calc_MemR);
+        -:   73://FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Add, sint32, sint32, sint32*);
+        -:   74://FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Sub, sint32, sint32, sint32*);
+        -:   75://FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Mul, sint32, sint32, sint32*);
+        -:   76://FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Div, sint32, sint32, sint32*);
+        -:   77:  
+        -:   78:/**
+        -:   79:  @brief Test zapisu do akumulatora
+        -:   80:
+        -:   81:  Funkcja testująca zapis danej do akumulatora.
+        -:   82:*/
+        -:   83://TODO
+        1:   84:void Test_Of_CanNm_Init(void)
+        -:   85:{
+        1:   86:  CanNm_Init(&cannmConfigPtr);
+        1:   87:  TEST_CHECK(NM_MODE_BUS_SLEEP == CanNm_Internal.Mode);   /** @req CANNM144 */
+        1:   88:  TEST_CHECK(NM_STATE_BUS_SLEEP == CanNm_Internal.State); /** @req CANNM141 */
+        1:   89:  TEST_CHECK(FALSE == CanNm_Internal.Requested);          /** @req CANNM143 */ /*released*/
+        -:   90:
+        -:   91:  //TEST_CHECK(0x00 == CanNm_Internal.TxMessageSdu);        /** @req CANNM085 */
+        -:   92:  //TEST_CHECK(0x00 == CanNm_Internal.RxMessageSdu);        /** @req CANNM085 */
+        -:   93:
+        1:   94:  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);            /** @req CANNM060 */
+        1:   95:}
+        -:   96:
+        -:   97:/**
+        -:   98:  @brief Test zapisu do akumulatora
+        -:   99:
+        -:  100:  Funkcja testująca zapis danej do akumulatora.
+        -:  101:*/
+        1:  102:void Test_Of_CanNm_DeInit (void)
+        -:  103:{
+        1:  104:  CanNm_DeInit();
+        -:  105:
+        1:  106:  TEST_CHECK(NM_STATE_UNINIT == CanNm_Internal.State);
+        1:  107:  TEST_CHECK(CANNM_STATUS_UNINIT == InitStatus);
+        1:  108:}
+        -:  109:
+        -:  110:/**
+        -:  111:  @brief Test zapisu do akumulatora
+        -:  112:
+        -:  113:  Funkcja testująca zapis danej do akumulatora.
+        -:  114:*/
+    #####:  115:void Test_Of_CanNm_PassiveStartUp (void)
+        -:  116:{
+        -:  117:
+    #####:  118:}
+        -:  119:
+        -:  120:/**
+        -:  121:  @brief Test zapisu do akumulatora
+        -:  122:
+        -:  123:  Funkcja testująca zapis danej do akumulatora.
+        -:  124:*/
+        1:  125:void Test_Of_CanNm_NetworkRequest (void)
+        -:  126:{
+        1:  127:  Std_ReturnType state = E_NOT_OK;
+        1:  128:  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
+        -:  129:
+        1:  130:  CanNm_Init(&cannmConfigPtr);
+        -:  131:
+        1:  132:  InitStatus = CANNM_STATUS_INIT; 
+        1:  133:  ModuleInternal->Mode = NM_MODE_BUS_SLEEP;
+        -:  134:
+        -:  135://///////////////////////////////////////
+        1:  136:  state = CanNm_NetworkRequest(nmChannelHandle);
+        -:  137:
+        1:  138:  TEST_CHECK(E_OK == state);
+        1:  139:  TEST_CHECK(TRUE == CanNm_Internal.Requested);
+        1:  140:  TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
+        1:  141:  TEST_CHECK(NM_STATE_REPEAT_MESSAGE == CanNm_Internal.State);
+        1:  142:  TEST_CHECK(CANNM_CBV_ACTIVE_WAKEUP_BIT == CanNm_Internal.TxMessageSdu[CanNm_ConfigPtr->CanNmPduCbvPosition]);
+        -:  143:
+        -:  144://////////////////////////////////////
+        1:  145:  ModuleInternal->Mode = NM_MODE_NETWORK;
+        1:  146:  state = CanNm_NetworkRequest(nmChannelHandle);
+        -:  147:
+        1:  148:  TEST_CHECK(E_NOT_OK == state);
+        -:  149:///////////////////////////////////////////
+        1:  150:  InitStatus = CANNM_STATUS_UNINIT;
+        1:  151:  state = CanNm_NetworkRequest(nmChannelHandle);
+        -:  152:
+        1:  153:  TEST_CHECK(E_NOT_OK == state);
+        1:  154:}
+        -:  155:
+        -:  156:/**
+        -:  157:  @brief Test zapisu do akumulatora
+        -:  158:
+        -:  159:  Funkcja testująca zapis danej do akumulatora.
+        -:  160:*/
+        1:  161:void Test_Of_CanNm_NetworkRelease (void)
+        -:  162:{
+        1:  163:  Std_ReturnType state = E_NOT_OK;
+        1:  164:  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
+        -:  165:
+        1:  166:  InitStatus = CANNM_STATUS_INIT;
+        1:  167:  ModuleInternal->Mode = NM_MODE_NETWORK;
+        1:  168:  ModuleInternal->State = NM_STATE_NORMAL_OPERATION;
+        -:  169:  
+        -:  170://///////////////////////////////////////
+        1:  171:  state = CanNm_NetworkRelease(nmChannelHandle);
+        -:  172:
+        1:  173:  TEST_CHECK(E_OK == state);
+        1:  174:  TEST_CHECK(FALSE == CanNm_Internal.Requested);
+        1:  175:  TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
+        1:  176:  TEST_CHECK(NM_STATE_READY_SLEEP == CanNm_Internal.State);
+        -:  177:
+        -:  178://////////////////////////////////////
+        1:  179:  ModuleInternal->State = NM_STATE_BUS_SLEEP;
+        1:  180:  state = CanNm_NetworkRelease(nmChannelHandle);
+        -:  181:
+        1:  182:  TEST_CHECK(E_NOT_OK == state);
+        -:  183:
+        -:  184://////////////////////////////////////
+        1:  185:  ModuleInternal->Mode = NM_MODE_BUS_SLEEP;
+        1:  186:  state = CanNm_NetworkRelease(nmChannelHandle);
+        -:  187:
+        1:  188:  TEST_CHECK(E_NOT_OK == state);
+        -:  189:
+        -:  190:///////////////////////////////////////////
+        1:  191:  InitStatus = CANNM_STATUS_UNINIT;
+        1:  192:  state = CanNm_NetworkRelease(nmChannelHandle);
+        -:  193:
+        1:  194:  TEST_CHECK(E_NOT_OK == state);
+        1:  195:}
+        -:  196:
+        -:  197:/**
+        -:  198:  @brief Test zapisu do akumulatora
+        -:  199:
+        -:  200:  Funkcja testująca zapis danej do akumulatora.
+        -:  201:*/
+        -:  202:/* // TODO nie trzeba chyba tego robić
+        -:  203:void Test_Of_CanNm_DisableCommunication (void)
+        -:  204:{
+        -:  205:
+        -:  206:}
+        -:  207:*/ 
+        -:  208:/**
+        -:  209:  @brief Test zapisu do akumulatora
+        -:  210:
+        -:  211:  Funkcja testująca zapis danej do akumulatora.
+        -:  212:*/
+        -:  213:/* //TODO nie trzeba chyba tego robić
+        -:  214:void Test_Of_CanNm_EnableCommunication (void)
+        -:  215:{
+        -:  216:
+        -:  217:}
+        -:  218:*/
+        -:  219:
+        -:  220:/**
+        -:  221:  @brief Test zapisu do akumulatora
+        -:  222:
+        -:  223:  Funkcja testująca zapis danej do akumulatora.
+        -:  224:*/
+        -:  225://TODO
+        -:  226:/*
+        -:  227:void Test_Of_CanNm_SetUserData (void)
+        -:  228:{
+        -:  229:  Std_ReturnType state = E_NOT_OK;
+        -:  230:  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
+        -:  231:
+        -:  232:  InitStatus = CANNM_STATUS_INIT;
+        -:  233:
+        -:  234:  InitStatus = CANNM_STATUS_UNINIT;
+        -:  235:
+        -:  236:  state = CanNm_SetUserData(nmChannelHandle, nmUserDataPtr);
+        -:  237:  TEST_CHECK(E_NOT_OK == CanNm_SetUserData);
+        -:  238:
+        -:  239:
+        -:  240:}
+        -:  241:*/
+        -:  242:/**
+        -:  243:  @brief Test zapisu do akumulatora
+        -:  244:
+        -:  245:  Funkcja testująca zapis danej do akumulatora.
+        -:  246:*/
+    #####:  247:void Test_Of_CanNm_GetUserData (void)
+        -:  248:{
+        -:  249:
+    #####:  250:}
+        -:  251:
+        -:  252:/**
+        -:  253:  @brief Test zapisu do akumulatora
+        -:  254:
+        -:  255:  Funkcja testująca zapis danej do akumulatora.
+        -:  256:*/
+    #####:  257:void Test_Of_CanNm_Transmit (void)
+        -:  258:{
+        -:  259:
+    #####:  260:}
+        -:  261:
+        -:  262:/**
+        -:  263:  @brief Test zapisu do akumulatora
+        -:  264:
+        -:  265:  Funkcja testująca zapis danej do akumulatora.
+        -:  266:*//*
+        -:  267:void Test_Of_CanNm_GetNodeIdentifier (void)
+        -:  268:{
+        -:  269:  Std_ReturnType state =E_NOT_OK;
+        -:  270:  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
+        -:  271:
+        -:  272:  InitStatus = CANNM_STATUS_INIT;
+        -:  273:
+        -:  274:  state = CanNm_GetNodeIdentifier(nmChannelHandle, nmNodeIdPtr);
+        -:  275:
+        -:  276:  TEST_CHECK(E_OK == state);
+        -:  277:  TEST_CHECK()
+        -:  278:}
+        -:  279:*/
+        -:  280:/**
+        -:  281:  @brief Test zapisu do akumulatora
+        -:  282:
+        -:  283:  Funkcja testująca zapis danej do akumulatora.
+        -:  284:*/
+    #####:  285:void Test_Of_CanNm_GetLocalNodeIdentifier (void)
+        -:  286:{
+        -:  287:
+    #####:  288:}
+        -:  289:
+        -:  290:/**
+        -:  291:  @brief Test zapisu do akumulatora
+        -:  292:
+        -:  293:  Funkcja testująca zapis danej do akumulatora.
+        -:  294:*/
+    #####:  295:void Test_Of_CanNm_RepeatMessageRequest (void)
+        -:  296:{
+        -:  297:
+    #####:  298:}
+        -:  299:
+        -:  300:/**
+        -:  301:  @brief Test zapisu do akumulatora
+        -:  302:
+        -:  303:  Funkcja testująca zapis danej do akumulatora.
+        -:  304:*/
+    #####:  305:void Test_Of_CanNm_GetPduData (void)
+        -:  306:{
+        -:  307:
+    #####:  308:}
+        -:  309:
+        -:  310:/**
+        -:  311:  @brief Test zapisu do akumulatora
+        -:  312:
+        -:  313:  Funkcja testująca zapis danej do akumulatora.
+        -:  314:*/
+    #####:  315:void Test_Of_CanNm_GetState (void)
+        -:  316:{
+        -:  317:  
+    #####:  318:}
+        -:  319:
+        -:  320:/**
+        -:  321:  @brief Test zapisu do akumulatora
+        -:  322:
+        -:  323:  Funkcja testująca zapis danej do akumulatora.
+        -:  324:*/
+    #####:  325:void Test_Of_CanNm_GetVersionInfo (void)
+        -:  326:{
+        -:  327:
+    #####:  328:}
+        -:  329:
+        -:  330:/**
+        -:  331:  @brief Test zapisu do akumulatora
+        -:  332:
+        -:  333:  Funkcja testująca zapis danej do akumulatora.
+        -:  334:*/
+    #####:  335:void Test_Of_CanNm_RequestBusSynchronization (void)
+        -:  336:{
+        -:  337:
+    #####:  338:}
+        -:  339:
+        -:  340:/**
+        -:  341:  @brief Test zapisu do akumulatora
+        -:  342:
+        -:  343:  Funkcja testująca zapis danej do akumulatora.
+        -:  344:*/
+    #####:  345:void Test_Of_CanNm_CheckRemoteSleepIndication (void)
+        -:  346:{
+        -:  347:
+    #####:  348:}
+        -:  349:
+        -:  350:/**
+        -:  351:  @brief Test zapisu do akumulatora
+        -:  352:
+        -:  353:  Funkcja testująca zapis danej do akumulatora.
+        -:  354:*/
+    #####:  355:void Test_Of_CanNm_SetSleepReadyBit (void)
+        -:  356:{
+        -:  357:
+    #####:  358:}
+        -:  359:
+        -:  360:/**
+        -:  361:  @brief Test zapisu do akumulatora
+        -:  362:
+        -:  363:  Funkcja testująca zapis danej do akumulatora.
+        -:  364:*/
+    #####:  365:void Test_Of_CanNm_PnLearningRequest (void)
+        -:  366:{
+        -:  367:
+    #####:  368:}
+        -:  369:
+        -:  370:/**
+        -:  371:  @brief Test zapisu do akumulatora
+        -:  372:
+        -:  373:  Funkcja testująca zapis danej do akumulatora.
+        -:  374:*/
+    #####:  375:void Test_Of_CanNm_RequestSynchronizedPncShutdown (void)
+        -:  376:{
+        -:  377:
+    #####:  378:}
+        -:  379:
+        -:  380:/**
+        -:  381:  @brief Test zapisu do akumulatora
+        -:  382:
+        -:  383:  Funkcja testująca zapis danej do akumulatora.
+        -:  384:*/
+    #####:  385:void Test_Of_CanNm_TxConfirmation (void)
+        -:  386:{
+        -:  387:
+    #####:  388:}
+        -:  389:
+        -:  390:/**
+        -:  391:  @brief Test zapisu do akumulatora
+        -:  392:
+        -:  393:  Funkcja testująca zapis danej do akumulatora.
+        -:  394:*/
+    #####:  395:void Test_Of_CanNm_RxIndication (void)
+        -:  396:{
+        -:  397:
+    #####:  398:}
+        -:  399:
+        -:  400:/**
+        -:  401:  @brief Test zapisu do akumulatora
+        -:  402:
+        -:  403:  Funkcja testująca zapis danej do akumulatora.
+        -:  404:*/
+    #####:  405:void Test_Of_CanNm_ConfirmPnAvailability (void)
+        -:  406:{
+        -:  407:
+    #####:  408:}
+        -:  409:
+        -:  410:/**
+        -:  411:  @brief Test zapisu do akumulatora
+        -:  412:
+        -:  413:  Funkcja testująca zapis danej do akumulatora.
+        -:  414:*/
+    #####:  415:void Test_Of_CanNm_TriggerTransmit (void)
+        -:  416:{
+        -:  417:
+    #####:  418:}
+        -:  419:
+        -:  420:/**
+        -:  421:  @brief Test zapisu do akumulatora
+        -:  422:
+        -:  423:  Funkcja testująca zapis danej do akumulatora.
+        -:  424:*/
+    #####:  425:void Test_Of_CanNm_MainFunction (void)
+        -:  426:{
+        -:  427:
+    #####:  428:}
+        -:  429:
+        -:  430:/*
+        -:  431:  Lista testów - wpisz tutaj wszystkie funkcje które mają być wykonane jako testy.
+        -:  432:*/
+        -:  433:TEST_LIST = {
+        -:  434:    { "Test of CanNm_Init", Test_Of_CanNm_Init },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  435:    { "Test of CanNm_DeInit", Test_Of_CanNm_DeInit },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  436://    { "Test of CanNm_PassiveStartUp", Test_Of_CanNm_PassiveStartUp },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  437:    { "Test of CanNm_NetworkRequest", Test_Of_CanNm_NetworkRequest },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  438:    { "Test of CanNm_NetworkRelease", Test_Of_CanNm_NetworkRelease },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  439://    { "Test of CanNm_DisableCommunication", Test_Of_CanNm_DisableCommunication },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  440://    { "Test of CanNm_EnableCommunication", Test_Of_CanNm_EnableCommunication },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  441://    { "Test of CanNm_SetUserData", Test_Of_CanNm_SetUserData },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  442://    { "Test of CanNm_GetUserData", Test_Of_CanNm_GetUserData },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  443://    { "Test of CanNm_Transmit", Test_Of_CanNm_Transmit },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  444://    { "Test of CanNm_GetNodeIdentifier", Test_Of_CanNm_GetNodeIdentifier },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  445://    { "Test of CanNm_GetLocalNodeIdentifier", Test_Of_CanNm_GetLocalNodeIdentifier },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  446://    { "Test of CanNm_RepeatMessageRequest", Test_Of_CanNm_RepeatMessageRequest },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  447://    { "Test of CanNm_GetPduData", Test_Of_CanNm_GetPduData },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  448://    { "Test of CanNm_GetState", Test_Of_CanNm_GetState },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  449://    { "Test of CanNm_GetVersionInfo", Test_Of_CanNm_GetVersionInfo },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  450://    { "Test of CanNm_RequestBusSynchronization", Test_Of_CanNm_RequestBusSynchronization },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  451://    { "Test of CanNm_CheckRemoteSleepIndication", Test_Of_CanNm_CheckRemoteSleepIndication },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  452://    { "Test of CanNm_SetSleepReadyBit", Test_Of_CanNm_SetSleepReadyBit },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  453://    { "Test of CanNm_PnLearningRequest", Test_Of_CanNm_PnLearningRequest },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  454://    { "Test of CanNm_RequestSynchronizedPncShutdown", Test_Of_CanNm_RequestSynchronizedPncShutdown },   /* Format to { "nazwa testu", nazwa_funkcji } */
+        -:  455://    { "Test of CanNm_TxConfirmation", Test_Of_CanNm_TxConfirmation },   /* Format to { "nazwa testu", nazwa_funkcji } */    
+        -:  456://    { "Test of CanNm_RxIndication", Test_Of_CanNm_RxIndication },   /* Format to { "nazwa testu", nazwa_funkcji } */    
+        -:  457://    { "Test of CanNm_ConfirmPnAvailability", Test_Of_CanNm_ConfirmPnAvailability },   /* Format to { "nazwa testu", nazwa_funkcji } */    
+        -:  458://    { "Test of CanNm_TriggerTransmit", Test_Of_CanNm_TriggerTransmit },   /* Format to { "nazwa testu", nazwa_funkcji } */    
+        -:  459://    { "Test of CanNm_MainFunction", Test_Of_CanNm_MainFunction },   /* Format to { "nazwa testu", nazwa_funkcji } */    
+        -:  460:    { NULL, NULL }                                        /* To musi być na końcu */
+        -:  461:};
+        -:  462:    

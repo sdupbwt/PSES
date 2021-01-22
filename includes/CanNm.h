@@ -72,6 +72,20 @@ typedef struct {
 
 } CanNm_ConfigType;
 
+//////////////////
+typedef struct {
+	Nm_ModeType Mode; /**< @req CANNM092 */
+	Nm_StateType State; /**< @req CANNM094 */
+	boolean Requested;
+    uint8 TxMessageSdu[8];
+    uint8 RxMessageSdu[8];
+    PduLengthType PduLength;
+    Std_VersionInfoType VersionInfo;
+    uint32 TimeoutTimeLeft;
+    uint32 RepeatMessageTimeLeft;
+    uint32 MessageCycleTimeLeft;
+} CanNm_InternalType;
+
 /*====================================================================================================================*\
     Eksport zmiennych globalnych
 \*====================================================================================================================*/
@@ -136,6 +150,21 @@ Std_ReturnType CanNm_TriggerTransmit (PduIdType TxPduId, PduInfoType* PduInfoPtr
 
 void CanNm_MainFunction (void);
 
+/*====================================================================================================================*\
+    Internal functions
+\*====================================================================================================================*/
 
+static inline PduLengthType CanNm_Internal_GetUserDataOffset( const CanNm_ConfigType* InConf );
+
+static inline uint8* CanNm_Internal_GetUserDataPtr( const CanNm_ConfigType* InConf, uint8* MessageSduPtr );
+
+static inline PduLengthType CanNm_Internal_GetUserDataLength( const CanNm_ConfigType* InputConf, const CanNm_InternalType* InternalConf );
+
+/*====================================================================================================================*\
+    Mocks
+\*====================================================================================================================*/
+
+void Nm_NetworkMode(NetworkHandleType nmChannelHandle);
+void Nm_NetworkStartIndication(NetworkHandleType NmNetworkHandle);
 
 #endif /* CANNM_H */
