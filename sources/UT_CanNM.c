@@ -8,6 +8,11 @@
 #include "../includes/fff.h"
 
 #include "../sources/CanNM.c"
+#include <string.h>
+
+DEFINE_FFF_GLOBALS;
+
+#define TEST
 
 /*====================================================================================================================*\
     Makra lokalne
@@ -27,6 +32,7 @@
 /*====================================================================================================================*\
     Zmienne lokalne (statyczne)
 \*====================================================================================================================*/
+
 
 
 static const CanNm_ConfigType cannmConfigPtr = {
@@ -75,12 +81,20 @@ Nm_ModeType nmModePtr = NM_MODE_BUS_SLEEP;
 
 //FAKE_VOID_FUNC(Lib_Calc_MemS, sint32);
 //FAKE_VALUE_FUNC(sint32, Lib_Calc_MemR);
-//FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Add, sint32, sint32, sint32*);
+
+/*====================================================================================================================*\
+      Funkcje mock
+\*====================================================================================================================*/
+
+FAKE_VALUE_FUNC(void *, MEMSET, void *, int, size_t);
+FAKE_VALUE_FUNC(void *, MEMCPY, void *, const void *, size_t);
+FAKE_VOID_FUNC(Nm_NetworkMode, NetworkHandleType);
+FAKE_VOID_FUNC(Nm_NetworkStartIndication, NetworkHandleType);
 //FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Sub, sint32, sint32, sint32*);
 //FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Mul, sint32, sint32, sint32*);
 //FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Div, sint32, sint32, sint32*);
   
-/**
+/** 
   @brief Test zapisu do akumulatora
 
   Funkcja testująca zapis danej do akumulatora.
@@ -95,7 +109,9 @@ void Test_Of_CanNm_Init(void)
 
 // TODO zrób mock
 // TEST_CHECK(0x00 == CanNm_Internal.TxMessageSdu);        /** @req CANNM085 */
-//  TEST_CHECK(0x00 == CanNm_Internal.RxMessageSdu);        /** @req CANNM085 */
+// TEST_CHECK(0x00 == CanNm_Internal.RxMessageSdu);        /** @req CANNM085 */
+TEST_CHECK(3 == MEMSET_fake.call_count);
+//TEST_CHECK(3 == MEMSET_fake.);
 
   TEST_CHECK(CANNM_STATUS_INIT == InitStatus);            /** @req CANNM060 */
 }
@@ -118,6 +134,7 @@ void Test_Of_CanNm_DeInit (void)
 
   Funkcja testująca zapis danej do akumulatora.
 */
+/*
 void Test_Of_CanNm_PassiveStartUp (void)
 {
   Std_ReturnType result = E_NOT_OK;  
@@ -150,7 +167,7 @@ void Test_Of_CanNm_PassiveStartUp (void)
 
   TEST_CHECK(E_NOT_OK == result);  
 }
-
+*/
 /**
   @brief Test zapisu do akumulatora
 
@@ -571,7 +588,7 @@ void Test_Of_CanNm_MainFunction (void)
 TEST_LIST = {
     { "Test of CanNm_Init", Test_Of_CanNm_Init },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_DeInit", Test_Of_CanNm_DeInit },   /* Format to { "nazwa testu", nazwa_funkcji } */
-    { "Test of CanNm_PassiveStartUp", Test_Of_CanNm_PassiveStartUp },   /* Format to { "nazwa testu", nazwa_funkcji } */
+//    { "Test of CanNm_PassiveStartUp", Test_Of_CanNm_PassiveStartUp },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_NetworkRequest", Test_Of_CanNm_NetworkRequest },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_NetworkRelease", Test_Of_CanNm_NetworkRelease },   /* Format to { "nazwa testu", nazwa_funkcji } */
 //    { "Test of CanNm_DisableCommunication", Test_Of_CanNm_DisableCommunication },   /* Format to { "nazwa testu", nazwa_funkcji } */
@@ -585,7 +602,7 @@ TEST_LIST = {
 //    { "Test of CanNm_GetPduData", Test_Of_CanNm_GetPduData },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_GetState", Test_Of_CanNm_GetState },   /* Format to { "nazwa testu", nazwa_funkcji } */
 //    { "Test of CanNm_GetVersionInfo", Test_Of_CanNm_GetVersionInfo },   /* Format to { "nazwa testu", nazwa_funkcji } */
-    { "Test of CanNm_RequestBusSynchronization", Test_Of_CanNm_RequestBusSynchronization },   /* Format to { "nazwa testu", nazwa_funkcji } */
+//    { "Test of CanNm_RequestBusSynchronization", Test_Of_CanNm_RequestBusSynchronization },   /* Format to { "nazwa testu", nazwa_funkcji } */
 //    { "Test of CanNm_CheckRemoteSleepIndication", Test_Of_CanNm_CheckRemoteSleepIndication },   /* Format to { "nazwa testu", nazwa_funkcji } */
 //    { "Test of CanNm_SetSleepReadyBit", Test_Of_CanNm_SetSleepReadyBit },   /* Format to { "nazwa testu", nazwa_funkcji } */
 //    { "Test of CanNm_PnLearningRequest", Test_Of_CanNm_PnLearningRequest },   /* Format to { "nazwa testu", nazwa_funkcji } */
