@@ -3,8 +3,6 @@
 
 /*====================================================================================================================*/
 
-
-
 /**===================================================================================================================*\
   @file CanNm.h
 
@@ -36,41 +34,91 @@ typedef enum {
 } CanNm_PduPositionType;
 
 typedef struct {
-	boolean	CanNmActiveWakeupBitEnabled;
-	boolean CanNmAllNmMessagesKeepAwake;
-	boolean	CanNmBusLoadReductionActive;
-	uint8	CanNmCarWakeUpBitPosition;
-	uint8	CanNmCarWakeUpBytePosition;
-	boolean	CanNmCarWakeUpFilterEnabled;
-	uint8	CanNmCarWakeUpFilterNodeId;
-	boolean	CanNmCarWakeUpRxEnabled;
-	boolean CanNmDynamicPncToChannelMappingEnabled;
-	uint32	CanNmImmediateNmCycleTime;
-	uint8	CanNmImmediateNmTransmissions;
-	uint32	CanNmMsgCycleOffset;
-	uint32	CanNmMsgCycleTime;
-	uint32	CanNmMsgReducedTime;
-	uint32	CanNmMsgTimeoutTime;
-	boolean	CanNmNodeDetectionEnabled;
-	uint8	CanNmNodeId;
-	boolean	CanNmNodeIdEnabled;
+	PduIdType	 RxPduId;
+	PduInfoType* RxPduRef;
+} CanNm_RxPdu;
+
+typedef struct {
+	PduIdType	 TxConfirmationPduId;
+	PduInfoType* TxPduRef;
+} CanNm_TxPdu;
+
+typedef struct {
+	PduIdType	 TxUserDataPduId;
+	PduInfoType* TxUserDataPduRef;
+} CanNm_UserDataTxPdu;
+
+typedef struct {
+	boolean					CanNmActiveWakeupBitEnabled;
+	boolean 				CanNmAllNmMessagesKeepAwake;
+	boolean					CanNmBusLoadReductionActive;
+	uint8					CanNmCarWakeUpBitPosition;
+	uint8					CanNmCarWakeUpBytePosition;
+	boolean					CanNmCarWakeUpFilterEnabled;
+	uint8					CanNmCarWakeUpFilterNodeId;
+	boolean					CanNmCarWakeUpRxEnabled;
+	float32					CanNmImmediateNmCycleTime;
+	uint8					CanNmImmediateNmTransmissions;
+	float32					CanNmMsgCycleOffset;
+	float32					CanNmMsgCycleTime;
+	float32					CanNmMsgReducedTime;
+	float32					CanNmMsgTimeoutTime;
+	boolean					CanNmNodeDetectionEnabled;
+	uint8					CanNmNodeId;
+	boolean					CanNmNodeIdEnabled;
 	CanNm_PduPositionType	CanNmPduCbvPosition;
 	CanNm_PduPositionType	CanNmPduNidPosition;
-	boolean	CanNmPnEnabled;
-	boolean	CanNmPnEraCalcEnabled;
-	boolean	CanNmPnHandleMultipleNetworkRequests;
-	uint32	CanNmRemoteSleepIndTime;
-	uint32	CanNmRepeatMessageTime;
-	boolean	CanNmRepeatMsgIndEnabled;
-	boolean	CanNmStayInPbsEnabled;
-	boolean	CanNmSynchronizedPncShutdownEnabled;
-	uint32	CanNmTimeoutTime;
-	uint32	CanNmWaitBusSleepTime;
-	NetworkHandleType NmNetworkHandle;
-//	Symbolic name reference to [ ComMChannel ]	CanNmComMNetworkHandleRef;
-//	Reference to [ Pdu ]	CanNmPnEraRxNSduRef;
+	boolean					CanNmPnEnabled;
+	boolean					CanNmPnEraCalcEnabled;
+	boolean					CanNmPnHandleMultipleNetworkRequests;
+	float32					CanNmRemoteSleepIndTime;
+	float32					CanNmRepeatMessageTime;
+	boolean					CanNmRepeatMsgIndEnabled;
+	float32					CanNmTimeoutTime;
+	float32					CanNmWaitBusSleepTime;
+	NetworkHandleType 		CanNmComMNetworkHandleRef;
+	PduInfoType				CanNmPnEraRxNSduRef;
+	CanNm_RxPdu*			CanNmRxPdu;
+	CanNm_TxPdu*			CanNmTxPdu;
+	CanNm_UserDataTxPdu*	CanNmUserDataTxPdu;
 
+} CanNm_ChannelType;
+
+typedef struct {
+	uint8 CanNmPnFilterMaskByteIndex;
+	uint8 CanNmPnFilterMaskByteValue;
+} CanNm_PnFilterMaskByte;
+
+typedef struct {
+	const uint8 					CanNmPnInfoLength;
+	const uint8 					CanNmPnInfoOffset;
+	const CanNm_PnFilterMaskByte* 	CanNmPnFilterMaskByte;
+} CanNm_PnInfo;
+
+typedef struct {
+	boolean				CanNmBusLoadReductionEnabled;
+	boolean				CanNmBusSynchronizationEnabled;
+	CanNm_ChannelType*	CanNmChannelConfig;
+	boolean				CanNmComControlEnabled;
+	boolean				CanNmComUserDataSupport;
+	boolean				CanNmCoordinationSyncSupport;
+	boolean				CanNmDevErrorDetect;
+	boolean				CanNmGlobalPnSupport;
+	boolean				CanNmImmediateRestartEnabled;
+	boolean				CanNmImmediateTxConfEnabled;
+	float32				CanNmMainFunctionPeriod;
+	boolean				CanNmPassiveModeEnabled;
+	boolean				CanNmPduRxIndicationEnabled;
+	boolean				CanNmPnEiraCalcEnabled;
+	CanNm_PnInfo*		CanNmPnInfo;
+	float32				CanNmPnResetTime;
+	boolean				CanNmRemoteSleepIndEnabled;
+	boolean				CanNmStateChangeIndEnabled;
+	boolean				CanNmUserDataEnabled;
+	boolean				CanNmVersionInfoApi;
+	PduInfoType*		CanNmPnEiraRxNSduRef;
 } CanNm_ConfigType;
+
 
 //////////////////
 typedef struct {
@@ -81,9 +129,10 @@ typedef struct {
     uint8 RxMessageSdu[8];
     PduLengthType PduLength;
     Std_VersionInfoType VersionInfo;
-    uint32 TimeoutTimeLeft;
-    uint32 RepeatMessageTimeLeft;
-    uint32 MessageCycleTimeLeft;
+    float32 TimeoutTimeLeft;
+    float32 RepeatMessageTimeLeft;
+    float32 MessageCycleTimeLeft;
+    float32 WaitBusSleepTimeLeft;
 } CanNm_InternalType;
 
 /*====================================================================================================================*\
@@ -97,10 +146,6 @@ typedef struct {
 /*====================================================================================================================*\
     Kod globalnych funkcji inline i makr funkcyjnych
 \*====================================================================================================================*/
-
-
-
-
 
 void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr);
 
@@ -150,21 +195,8 @@ Std_ReturnType CanNm_TriggerTransmit (PduIdType TxPduId, PduInfoType* PduInfoPtr
 
 void CanNm_MainFunction (void);
 
-/*====================================================================================================================*\
-    Internal functions
-\*====================================================================================================================*/
 
-static inline PduLengthType CanNm_Internal_GetUserDataOffset( const CanNm_ConfigType* InConf );
-
-static inline uint8* CanNm_Internal_GetUserDataPtr( const CanNm_ConfigType* InConf, uint8* MessageSduPtr );
-
-static inline PduLengthType CanNm_Internal_GetUserDataLength( const CanNm_ConfigType* InputConf, const CanNm_InternalType* InternalConf );
-
-/*====================================================================================================================*\
-    Mocks
-\*====================================================================================================================*/
-
-void Nm_NetworkMode(NetworkHandleType nmChannelHandle);
-void Nm_NetworkStartIndication(NetworkHandleType NmNetworkHandle);
+//void Nm_NetworkMode(NetworkHandleType nmChannelHandle);
+//void Nm_NetworkStartIndication(NetworkHandleType NmNetworkHandle);
 
 #endif /* CANNM_H */
