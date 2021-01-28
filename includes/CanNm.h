@@ -165,8 +165,6 @@ Std_ReturnType CanNm_SetUserData (NetworkHandleType nmChannelHandle, const uint8
 
 Std_ReturnType CanNm_GetUserData (NetworkHandleType nmChannelHandle, uint8* nmUserDataPtr);
 
-Std_ReturnType CanNm_Transmit (PduIdType TxPduId, const PduInfoType* PduInfoPtr);
-
 Std_ReturnType CanNm_GetNodeIdentifier (NetworkHandleType nmChannelHandle, uint8* nmNodeIdPtr);
 
 Std_ReturnType CanNm_GetLocalNodeIdentifier (NetworkHandleType nmChannelHandle, uint8* nmNodeIdPtr);

@@ -121,6 +121,7 @@ PduIdType RxPduId = 0;
 
 void Test_Of_CanNm_Init(void)
 {
+  //TODO dodać if
   ////////////////////////////////
   // CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
 //  CanNm_ConfigPtrTest. CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
@@ -336,16 +337,6 @@ void Test_Of_CanNm_GetUserData (void)
 
   result = CanNm_GetUserData(nmChannelHandle, &nmUserDataPtr);
   TEST_CHECK(E_NOT_OK == result);
-}
-
-/**
-  @brief Test zapisu do akumulatora
-
-  Funkcja testująca zapis danej do akumulatora.
-*/
-void Test_Of_CanNm_Transmit (void)
-{
-
 }
 
 /**
