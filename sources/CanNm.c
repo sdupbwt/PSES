@@ -40,6 +40,7 @@ CanNm_InternalType CanNm_Internal = {
 };
 
 static const CanNm_ConfigType* CanNm_ConfigPtr;
+
 /*====================================================================================================================*\
     Zmienne lokalne (statyczne)
  \*====================================================================================================================*/
@@ -50,14 +51,11 @@ static const CanNm_ConfigType* CanNm_ConfigPtr;
 static inline PduLengthType CanNm_Internal_GetUserDataOffset( const CanNm_ConfigType* InConf );
 static inline uint8* CanNm_Internal_GetUserDataPtr( const CanNm_ConfigType* InConf, uint8* MessageSduPtr );
 static inline PduLengthType CanNm_Internal_GetUserDataLength( const CanNm_ConfigType* InputConf, const CanNm_InternalType* InternalConf );
-/*====================================================================================================================*\
-    Kod globalnych funkcji inline i makr funkcyjnych
- \*====================================================================================================================*/
 
 /*====================================================================================================================*\
-    Kod funkcji
+    Funkcje mock
  \*====================================================================================================================*/
-//TODO mocki nie mogę być w kodzie źródłowym
+
 #ifdef TEST
 DEFINE_FFF_GLOBALS;
 
@@ -67,7 +65,36 @@ FAKE_VOID_FUNC(Nm_PrepareBusSleepMode, NetworkHandleType);
 FAKE_VOID_FUNC(Nm_BusSleepMode, NetworkHandleType);				
 #endif
 
-//TODO SWS, opisy funkcji
+/*====================================================================================================================*\
+    Zmienne konfiguracyjne
+ \*====================================================================================================================*/
+/*
+CanNmDevErrorDetect					FALSE
+CanNmVersionInfoApi					TRUE
+CanNmPassiveModeEnabled				FALSE
+CanNmUserDataEnabled				TRUE
+CanNmRemoteSleepIndEnabled			FALSE
+CanNmBusSynchronizationEnabled		FALSE
+CanNmBusLoadReductionEnabled		FALSE
+CanNmNodeIdEnabled					TRUE
+CanNmNodeDetectionEnabled			TRUE
+CanNmImmediateRestartEnabled		FALSE
+CanNmPduRxIndicationEnabled			TRUE
+CanNmStateChangeIndEnabled			FALSE
+CanNmComControlEnabled				FALSE
+CanNmImmadiateTxconfEnabled			FALSE
+CanNmRepeatMsgIndEnabled			FALSE
+CanNmCoordinatorSyncSupport 		FALSE
+CanNmGlobalPnSupport				FALSE
+
+Channels							1
+
+ */
+
+/*====================================================================================================================*\
+    Kod funkcji
+ \*====================================================================================================================*/
+
 /** @brief CanNm_Init [SWS_CanNm_00208]
  *
  * Initialize the CanNm module.
@@ -114,7 +141,6 @@ void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr) {
  *
  * De-initializes the CanNm module.
  *
- TODO ustawić wskaźniki na NULL
  */
 void CanNm_DeInit(void){
 
@@ -128,6 +154,7 @@ void CanNm_DeInit(void){
 		{
 			ModuleInternal->State = NM_STATE_UNINIT;
 			InitStatus = CANNM_STATUS_UNINIT;
+			CanNm_ConfigPtr = NULL;
 		}
 	}
 	else
@@ -260,7 +287,7 @@ Std_ReturnType CanNm_NetworkRelease(NetworkHandleType nmChannelHandle)
  *
  *  Disable the NM PDU transmission ability due to a ISO14229 Communication Control (28hex) service
  *
- *  CANNM_COM_CONTROL_ENABLED = STD_OFF
+ *  CanNmComControlEnabled = FALSE
  */
 
 Std_ReturnType CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
@@ -270,7 +297,7 @@ Std_ReturnType CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
  *
  * Enable the NM PDU transmission ability due to a ISO14229 Communication Control (28hex) service
  *
- * CANNM_COM_CONTROL_ENABLED = STD_OFF
+ * CanNmComControlEnabled = FALSE
  */
 Std_ReturnType CanNm_EnableCommunication(NetworkHandleType nmChannelHandle);
 
@@ -279,7 +306,7 @@ Std_ReturnType CanNm_EnableCommunication(NetworkHandleType nmChannelHandle);
  *
  * Set user data for NM PDUs transmitted next on the bus.
  *
- * CANNM_USER_DATA_ENABLED == STD_ON
+ * CanNmUserDataEnabled == TRUE
  */
 Std_ReturnType CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8* nmUserDataPtr)
 {
@@ -309,7 +336,7 @@ Std_ReturnType CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8*
  *
  * Get user data out of the most recently received NM PDU.
  *
- * CANNM_USER_DATA_ENABLED == STD_ON
+ * CanNmUserDataEnabled == TRUE
  */
 Std_ReturnType CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8* nmUserDataPtr)
 {
@@ -643,7 +670,7 @@ void CanNm_RxIndication(PduIdType RxPduId, const PduInfoType* PduInfoPtr)
  * Enables the PN filter functionality on the indicated NM channel.
  * Availability: The API is only available if CanNmGlobalPnSupport is TRUE.
  *
- * CanNmGlobalPnSupport = OFF
+ * CanNmGlobalPnSupport = FALSE
  */
 void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle);
 

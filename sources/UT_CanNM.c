@@ -121,11 +121,9 @@ PduIdType RxPduId = 0;
 
   Test function of CanNm_Init.
 */
-//TODO
 
 void Test_Of_CanNm_Init(void)
 {
-  //TODO dodać if
   ////////////////////////////////
   // CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
 //  CanNm_ConfigPtrTest. CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
@@ -338,8 +336,6 @@ void Test_Of_CanNm_SetUserData (void)
   @brief Test_Of_CanNm_GetUserData
   
   Test function of CanNm_GetUserData.
-
-  TODO popraw, bo błędy
 */
 void Test_Of_CanNm_GetUserData (void)
 {
@@ -391,8 +387,6 @@ void Test_Of_CanNm_GetNodeIdentifier (void)
 
   TEST_CHECK(E_OK == result);
   TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
-  // TODO sprawdź wartość
-  //TEST_CHECK( == *nmNodeIdPtr);
 
   /////////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
@@ -419,8 +413,6 @@ void Test_Of_CanNm_GetLocalNodeIdentifier (void)
   result = CanNm_GetLocalNodeIdentifier(nmChannelHandle, &nmNodeIdPtr);
 
   TEST_CHECK(E_OK == result);
-  //TODO sprawdź wartość
-  //TEST_CHECK( == *nmNodeIdPtr);
 
   ////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
@@ -530,7 +522,6 @@ void Test_Of_CanNm_RepeatMessageRequest (void)
 
   Test function of CanNm_GetPduData.
 */
-//TODO
 void Test_Of_CanNm_GetPduData (void)
 {
 	Std_ReturnType result = E_NOT_OK;
@@ -587,7 +578,6 @@ void Test_Of_CanNm_GetState (void)
 
   Test function of CanNm_GetVersionInfo.
 */
-//TODO
 void Test_Of_CanNm_GetVersionInfo (void)
 {
   Std_VersionInfoType versioninfo;
@@ -595,7 +585,6 @@ void Test_Of_CanNm_GetVersionInfo (void)
   CanNm_Init(&CanNm_ConfigPtrTest);
   CanNm_GetVersionInfo(&versioninfo);
 
-// TODO wskaźniki
   // TEST_CHECK(CanNm_Internal.VersionInfo == versioninfo);
 }
 
@@ -604,7 +593,6 @@ void Test_Of_CanNm_GetVersionInfo (void)
 
   Test function of CanNm_TxConfirmation.
 */
-// TODO, zapytaj, czy na pewno tak ma być
 
 void Test_Of_CanNm_TxConfirmation (void)
 {
@@ -618,7 +606,6 @@ void Test_Of_CanNm_TxConfirmation (void)
 
   CanNm_TxConfirmation(TxPduId, result);
 
-//TODO coś nie działa
   // TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig.CanNmMsgTimeoutTime == CanNm_Internal.TimeoutTimeLeft);
 
   //////////////////////////////////
@@ -693,7 +680,6 @@ void Test_Of_CanNm_RxIndication (void)
 
   Test function of CanNm_TriggerTransmit.
 
-TODO popraw
 */
 void Test_Of_CanNm_TriggerTransmit (void)
 {
