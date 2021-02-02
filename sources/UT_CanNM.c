@@ -636,8 +636,12 @@ void Test_Of_CanNm_TxConfirmation (void)
 */
 void Test_Of_CanNm_RxIndication (void)
 {
-  PduInfoType PduInfoPtrTest;
   CanNm_Init(&CanNm_ConfigPtrTest);
+  static uint8 PduInfoDataTest[CANNM_SDU_LENGTH];
+  PduInfoType PduInfoPtrTest = {
+		  .SduDataPtr = PduInfoDataTest,
+		  .SduLength = 1
+  };
 
   //////////////////////////
   InitStatus = CANNM_STATUS_INIT;
@@ -657,13 +661,13 @@ void Test_Of_CanNm_RxIndication (void)
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
 
-  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);  
+  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);
 
   //////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
 
-  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);  
+  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);
 
   //////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
@@ -695,7 +699,7 @@ void Test_Of_CanNm_TriggerTransmit (void)
   // PduInfoPtrTest2.SduLength = sizeof(CanNm_Internal.TxMessageSdu);
   result = CanNm_TriggerTransmit(TxPduId, &PduInfoPtrTest2);
 
-  // TEST_CHECK(E_OK == result);
+  // TEST_CHECK(E_OK == result); TODO
 
   ///////////////////////////  
   // PduInfoPtr.SduLength = sizeof(CanNm_Internal.TxMessageSdu) + 1;
