@@ -33,19 +33,22 @@
     Zmienne lokalne (statyczne)
 \*====================================================================================================================*/
 
+static uint8 SduRxMessageTest[CANNM_SDU_LENGTH];
+static uint8 SduTxMessageTest[CANNM_SDU_LENGTH];
+
 CanNm_InternalType ModInternal = {
   .RxMessageSdu = 0,
   .PduLength = 0
 };
 
 PduInfoType TxPduRefTest = {
-  .SduDataPtr = 0,
-  .SduLength = 0
+  .SduDataPtr = SduTxMessageTest,
+  .SduLength = 1
 };
 
 PduInfoType RxPduRefTest = {
-  .SduDataPtr = 0,
-  .SduLength = 0
+  .SduDataPtr = SduRxMessageTest,
+  .SduLength = 1
 };
 
 static PduInfoType PduInfoPtr = {
@@ -67,18 +70,19 @@ static CanNm_RxPdu CanNmRxPduTest = {
 
 static CanNm_ChannelType CanNmChannelConfigTest = {
   .CanNmNodeIdEnabled = 0,
-  .CanNmNodeId = 0,
+  .CanNmNodeId = 1,
   .CanNmTxPdu = &CanNmTxPduTest,
   .CanNmRxPdu = &CanNmRxPduTest,
   .CanNmPduNidPosition = CANNM_PDU_BYTE_0,
   .CanNmPduCbvPosition = CANNM_PDU_BYTE_0,
-  .CanNmMsgTimeoutTime = 2000
+  .CanNmMsgTimeoutTime = 2000,
+  .CanNmTimeoutTime = 6
 };
 
 
 static CanNm_ConfigType CanNm_ConfigPtrTest = {
   .CanNmChannelConfig = &CanNmChannelConfigTest,
-  .CanNmMainFunctionPeriod = 0
+  .CanNmMainFunctionPeriod = 5
 };
 
 NetworkHandleType nmChannelHandle = 0;
@@ -113,9 +117,9 @@ PduIdType RxPduId = 0;
 
   
 /** 
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_Init
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_Init.
 */
 //TODO
 
@@ -126,19 +130,35 @@ void Test_Of_CanNm_Init(void)
   // CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
 //  CanNm_ConfigPtrTest. CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
 
-
+  ///////////////////////////////  
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
   CanNm_Init(&CanNm_ConfigPtrTest);
 
-  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
-  // TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig.CanNmNodeId == 		CanNm_ConfigPtr->CanNmChannelConfig->CanNmTxPdu->TxPduRef->SduDataPtr[CanNm_ConfigPtr->CanNmChannelConfig->CanNmPduNidPosition]);
+  // TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
+  // // TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig.CanNmNodeId == 		CanNm_ConfigPtr->CanNmChannelConfig->CanNmTxPdu->TxPduRef->SduDataPtr[CanNm_ConfigPtr->CanNmChannelConfig->CanNmPduNidPosition]);
 
+  // ///////////////////////////////  
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 0;
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
+  CanNm_Init(&CanNm_ConfigPtrTest);
+
+  ///////////////////////////////  
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_OFF;
+  CanNm_Init(&CanNm_ConfigPtrTest);
+
+  ///////////////////////////////  
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = FALSE;
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_OFF;
+  CanNm_Init(&CanNm_ConfigPtrTest);
 
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_DeInit
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_DeInit.
 */
 void Test_Of_CanNm_DeInit (void)
 {
@@ -165,9 +185,9 @@ void Test_Of_CanNm_DeInit (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_PassiveStartUp
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_PassiveStartUp.
 */
 
 void Test_Of_CanNm_PassiveStartUp (void)
@@ -211,9 +231,9 @@ void Test_Of_CanNm_PassiveStartUp (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_NetworkRequest
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_NetworkRequest.
 */
 void Test_Of_CanNm_NetworkRequest (void)
 {
@@ -249,9 +269,9 @@ void Test_Of_CanNm_NetworkRequest (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_NetworkRelease
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_NetworkRelease.
 */
 void Test_Of_CanNm_NetworkRelease (void)
 {
@@ -291,11 +311,10 @@ void Test_Of_CanNm_NetworkRelease (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_SetUserData
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_SetUserData.
 */
-//TODO
 
 void Test_Of_CanNm_SetUserData (void)
 {
@@ -316,9 +335,10 @@ void Test_Of_CanNm_SetUserData (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_GetUserData
+  
+  Test function of CanNm_GetUserData.
 
-  Funkcja testująca zapis danej do akumulatora.
   TODO popraw, bo błędy
 */
 void Test_Of_CanNm_GetUserData (void)
@@ -340,9 +360,9 @@ void Test_Of_CanNm_GetUserData (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_GetNodeIdentifier
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_GetNodeIdentifier.
 */
 
 void Test_Of_CanNm_GetNodeIdentifier (void)
@@ -384,9 +404,9 @@ void Test_Of_CanNm_GetNodeIdentifier (void)
 
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_GetLocalNodeIdentifier
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_GetLocalNodeIdentifier.
 */
 void Test_Of_CanNm_GetLocalNodeIdentifier (void)
 {
@@ -412,9 +432,9 @@ void Test_Of_CanNm_GetLocalNodeIdentifier (void)
 
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_RepeatMessageRequest
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_RepeatMessageRequest.
 */
 void Test_Of_CanNm_RepeatMessageRequest (void)
 {
@@ -488,6 +508,15 @@ void Test_Of_CanNm_RepeatMessageRequest (void)
   TEST_CHECK(E_NOT_OK == result);
 
   ////////////////////////////
+  InitStatus = CANNM_STATUS_INIT;
+  // ModuleInternal->Mode = NM_STATE_REPEAT_MESSAGE;
+  ModuleInternal->State = NM_STATE_REPEAT_MESSAGE;
+  
+  result = CanNm_RepeatMessageRequest(nmChannelHandle);
+
+  TEST_CHECK(E_NOT_OK == result);
+
+  ////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
   
   result = CanNm_RepeatMessageRequest(nmChannelHandle);
@@ -497,9 +526,9 @@ void Test_Of_CanNm_RepeatMessageRequest (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_GetPduData
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_GetPduData.
 */
 //TODO
 void Test_Of_CanNm_GetPduData (void)
@@ -522,9 +551,9 @@ void Test_Of_CanNm_GetPduData (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_GetState
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_GetState.
 */
 void Test_Of_CanNm_GetState (void)
 {
@@ -554,9 +583,9 @@ void Test_Of_CanNm_GetState (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_GetVersionInfo
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_GetVersionInfo.
 */
 //TODO
 void Test_Of_CanNm_GetVersionInfo (void)
@@ -571,9 +600,9 @@ void Test_Of_CanNm_GetVersionInfo (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_TxConfirmation
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_TxConfirmation.
 */
 // TODO, zapytaj, czy na pewno tak ma być
 
@@ -585,6 +614,7 @@ void Test_Of_CanNm_TxConfirmation (void)
   ///////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
+  result = E_OK;
 
   CanNm_TxConfirmation(TxPduId, result);
 
@@ -594,6 +624,14 @@ void Test_Of_CanNm_TxConfirmation (void)
   //////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
+  result = E_NOT_OK;
+
+  CanNm_TxConfirmation(TxPduId, result);
+
+  //////////////////////////////////
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_NETWORK;
+  result = E_NOT_OK;
 
   CanNm_TxConfirmation(TxPduId, result);
 
@@ -605,9 +643,9 @@ void Test_Of_CanNm_TxConfirmation (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_RxIndication
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_RxIndication.
 */
 void Test_Of_CanNm_RxIndication (void)
 {
@@ -651,7 +689,9 @@ void Test_Of_CanNm_RxIndication (void)
 
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_TriggerTransmit
+
+  Test function of CanNm_TriggerTransmit.
 
 TODO popraw
 */
@@ -679,23 +719,25 @@ void Test_Of_CanNm_TriggerTransmit (void)
 }
 
 /**
-  @brief Test zapisu do akumulatora
+  @brief Test_Of_CanNm_MainFunction
 
-  Funkcja testująca zapis danej do akumulatora.
+  Test function of CanNm_MainFunction.
 */
 void Test_Of_CanNm_MainFunction (void)
 {
-  CanNm_Init(&CanNm_ConfigPtrTest);
 
   ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
-  CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
+  CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod; // + 1;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
 
   CanNm_MainFunction();
+  
 
   ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
@@ -704,6 +746,7 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
@@ -712,6 +755,7 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
@@ -719,26 +763,28 @@ void Test_Of_CanNm_MainFunction (void)
 
   CanNm_MainFunction();
 
-  // ///////////////////////////
-  // InitStatus = CANNM_STATUS_INIT;
-  // CanNm_Internal.Mode = NM_MODE_NETWORK;
-  // // CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod - 1;
-  // CanNm_ConfigPtrTest.CanNmMainFunctionPeriod = CanNm_Internal.TimeoutTimeLeft + 1;
-
-  // CanNm_Init(&CanNm_ConfigPtrTest);
-
-  //  CanNm_MainFunction();
-
   ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
+  CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod + 1;
+
+   CanNm_MainFunction();
+
+  ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_NETWORK;
+  CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
+  CanNm_Internal.MessageCycleTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod + 1;
 
   CanNm_Internal.Requested = TRUE;
 
   CanNm_MainFunction();
 
   ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
@@ -748,6 +794,7 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
@@ -757,18 +804,46 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
-  CanNm_Internal.State = NM_STATE_NORMAL_OPERATION;
+  CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
+  CanNm_Internal.Requested = TRUE;
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduCbvPosition = CANNM_PDU_OFF;
+  CanNm_Internal.RepeatMessageTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod + 1;
+
+  CanNm_MainFunction();
+
+  ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
+  // CanNm_Internal.State = NM_STATE_NORMAL_OPERATION;
+  CanNm_Internal.WaitBusSleepTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
+
+  CanNm_MainFunction();
+
+  ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
+  // CanNm_Internal.State = NM_STATE_NORMAL_OPERATION;
+  CanNm_Internal.WaitBusSleepTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod + 1;
+
+  CanNm_MainFunction();
+
+  ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
 
   CanNm_MainFunction();
 
 
 
-
-
-  // ///////////////////////////
-  // InitStatus = CANNM_STATUS_UNINIT;
+  ///////////////////////////
+  CanNm_Init(&CanNm_ConfigPtrTest);
+  InitStatus = CANNM_STATUS_UNINIT;
 
   CanNm_MainFunction();
 
