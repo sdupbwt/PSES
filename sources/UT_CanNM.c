@@ -649,8 +649,6 @@ void Test_Of_CanNm_GetVersionInfo (void)
     .sw_patch_version = 1
   };
 
-  Std_VersionInfoType VersioninfoTest = CanNm_Internal.VersionInfo;
-
   CanNm_Init(&CanNm_ConfigPtrTest);
   
   CanNm_GetVersionInfo(&versioninfo);
