@@ -784,20 +784,23 @@ void Test_Of_CanNm_RxIndication (void)
 void Test_Of_CanNm_TriggerTransmit (void)
 {
   Std_ReturnType result = E_NOT_OK;
-  PduInfoType PduInfoPtrTestTx;
-  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
-  uint16 Test = sizeof(ModuleInternal->TxMessageSdu);
+  
+  static uint8 PduInfoDataTxTest[CANNM_SDU_LENGTH];
+  PduInfoType PduInfoPtrTestTx = {
+    .SduDataPtr = PduInfoDataTxTest,
+    .SduLength = 2
+  };
 
   CanNm_Init(&CanNm_ConfigPtrTest);
 
   ///////////////////////////
-  PduInfoPtrTestTx.SduLength = Test;
+  PduInfoPtrTestTx.SduLength = sizeof(CanNm_Internal.TxMessageSdu);
   result = CanNm_TriggerTransmit(TxPduId, &PduInfoPtrTestTx);
 
   TEST_CHECK(E_OK == result);
 
   ///////////////////////////  
-  PduInfoPtrTestTx.SduLength = Test + 1;
+  PduInfoPtrTestTx.SduLength = sizeof(CanNm_Internal.TxMessageSdu) + 1;
   result = CanNm_TriggerTransmit(TxPduId, &PduInfoPtr);
 
   TEST_CHECK(E_NOT_OK == result);
