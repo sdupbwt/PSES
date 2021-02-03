@@ -85,35 +85,15 @@ static CanNm_ConfigType CanNm_ConfigPtrTest = {
   .CanNmMainFunctionPeriod = 5
 };
 
-NetworkHandleType nmChannelHandle = 0;
-uint8 nmNodeIdPtr = 1;
-Nm_StateType nmStatePtr = NM_STATE_READY_SLEEP;
-Nm_ModeType nmModePtr = NM_MODE_BUS_SLEEP;
-uint8 nmUserDataPtr = 1;
-uint8 nmPduDataPtr = 1;
-PduIdType TxPduId = 0;
-PduIdType RxPduId = 0;
-//Std_VersionInfoType versioninfo = moduleID;
-
-//const uint8* nmUserDataPtr = 
-
-//DEFINE_FFF_GLOBALS;
-
-//FAKE_VOID_FUNC(Lib_Calc_MemS, sint32);
-//FAKE_VALUE_FUNC(sint32, Lib_Calc_MemR);
-
-/*====================================================================================================================*\
-      Funkcje mock
-\*====================================================================================================================*/
-
-// FAKE_VALUE_FUNC(void *, MEMSET, void *, int, size_t);
-// FAKE_VALUE_FUNC(void *, MEMCPY, void *, const void *, size_t);
-// FAKE_VOID_FUNC(Nm_NetworkMode, NetworkHandleType);
-// FAKE_VOID_FUNC(Nm_NetworkStartIndication, NetworkHandleType);
-//FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Sub, sint32, sint32, sint32*);
-//FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Mul, sint32, sint32, sint32*);
-//FAKE_VALUE_FUNC(Std_ReturnType, Lib_Calc_Div, sint32, sint32, sint32*);
-  
+static NetworkHandleType nmChannelHandle = 0;
+static uint8 nmNodeIdPtr = 1;
+static Nm_StateType nmStatePtr = NM_STATE_READY_SLEEP;
+static Nm_ModeType nmModePtr = NM_MODE_BUS_SLEEP;
+static uint8 nmUserDataPtr = 1;
+static uint8 nmPduDataPtr = 1;
+static PduIdType TxPduId = 0;
+static PduIdType RxPduId = 0;
+ 
 
   
 /** 
@@ -158,6 +138,7 @@ void Test_Of_CanNm_Init(void)
 
 }
 
+
 /**
   @brief Test_Of_CanNm_DeInit
 
@@ -192,6 +173,7 @@ void Test_Of_CanNm_DeInit (void)
   TEST_CHECK(NM_STATE_UNINIT == CanNm_Internal.State);
   TEST_CHECK(CANNM_STATUS_UNINIT == InitStatus);
 }
+
 
 /**
   @brief Test_Of_CanNm_PassiveStartUp
@@ -244,6 +226,7 @@ void Test_Of_CanNm_PassiveStartUp (void)
   TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
   TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
 }
+
 
 /**
   @brief Test_Of_CanNm_NetworkRequest
@@ -309,6 +292,7 @@ void Test_Of_CanNm_NetworkRequest (void)
   TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
 }
 
+
 /**
   @brief Test_Of_CanNm_NetworkRelease
 
@@ -373,6 +357,7 @@ void Test_Of_CanNm_NetworkRelease (void)
   TEST_CHECK(NM_STATE_READY_SLEEP != CanNm_Internal.State);
 }
 
+
 /**
   @brief Test_Of_CanNm_SetUserData
 
@@ -397,6 +382,7 @@ void Test_Of_CanNm_SetUserData (void)
   result = CanNm_SetUserData(nmChannelHandle, &nmUserDataPtr);
   TEST_CHECK(E_NOT_OK == result);
 }
+
 
 /**
   @brief Test_Of_CanNm_GetUserData
@@ -423,6 +409,7 @@ void Test_Of_CanNm_GetUserData (void)
 
   TEST_CHECK(E_NOT_OK == result);
 }
+
 
 /**
   @brief Test_Of_CanNm_GetNodeIdentifier
@@ -572,8 +559,8 @@ void Test_Of_CanNm_RepeatMessageRequest (void)
   TEST_CHECK(E_NOT_OK == result);   
   TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
   TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
-
 }
+
 
 /**
   @brief Test_Of_CanNm_GetPduData
@@ -599,6 +586,7 @@ void Test_Of_CanNm_GetPduData (void)
   
   TEST_CHECK(E_NOT_OK == result);
 }
+
 
 /**
   @brief Test_Of_CanNm_GetState
@@ -631,8 +619,8 @@ void Test_Of_CanNm_GetState (void)
   TEST_CHECK(E_NOT_OK == result); 
   TEST_CHECK(CanNm_Internal.State != nmStatePtr);
   TEST_CHECK(CanNm_Internal.Mode != nmModePtr);
-
 }
+
 
 /**
   @brief Test_Of_CanNm_GetVersionInfo
@@ -653,13 +641,13 @@ void Test_Of_CanNm_GetVersionInfo (void)
   
   CanNm_GetVersionInfo(&versioninfo);
 
-
   TEST_CHECK(CanNm_Internal.VersionInfo.vendorID == versioninfo.vendorID);
   TEST_CHECK(CanNm_Internal.VersionInfo.moduleID == versioninfo.moduleID);
   TEST_CHECK(CanNm_Internal.VersionInfo.sw_major_version == versioninfo.sw_major_version);
   TEST_CHECK(CanNm_Internal.VersionInfo.sw_minor_version == versioninfo.sw_minor_version);
   TEST_CHECK(CanNm_Internal.VersionInfo.sw_patch_version == versioninfo.sw_patch_version);
 }
+
 
 /**
   @brief Test_Of_CanNm_TxConfirmation
@@ -723,6 +711,7 @@ void Test_Of_CanNm_TxConfirmation (void)
   TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmMsgTimeoutTime != CanNm_Internal.TimeoutTimeLeft); 
 }
 
+
 /**
   @brief Test_Of_CanNm_RxIndication
 
@@ -767,9 +756,6 @@ void Test_Of_CanNm_RxIndication (void)
   InitStatus = CANNM_STATUS_UNINIT;
 
   CanNm_RxIndication(RxPduId, &PduInfoPtrTestRx);
-
-
-
 }
 
 
@@ -803,6 +789,7 @@ void Test_Of_CanNm_TriggerTransmit (void)
 
   TEST_CHECK(E_NOT_OK == result);
 }
+
 
 /**
   @brief Test_Of_CanNm_MainFunction
@@ -913,13 +900,12 @@ void Test_Of_CanNm_MainFunction (void)
 
   CanNm_MainFunction();
 
-
   ///////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
 
   CanNm_MainFunction();
-
 }
+
 
 /*
   Lista testów - wpisz tutaj wszystkie funkcje które mają być wykonane jako testy.
@@ -932,7 +918,6 @@ TEST_LIST = {
     { "Test of CanNm_NetworkRelease", Test_Of_CanNm_NetworkRelease },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_SetUserData", Test_Of_CanNm_SetUserData },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_GetUserData", Test_Of_CanNm_GetUserData },   /* Format to { "nazwa testu", nazwa_funkcji } */
-//    { "Test of CanNm_Transmit", Test_Of_CanNm_Transmit },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_GetNodeIdentifier", Test_Of_CanNm_GetNodeIdentifier },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_GetLocalNodeIdentifier", Test_Of_CanNm_GetLocalNodeIdentifier },   /* Format to { "nazwa testu", nazwa_funkcji } */
     { "Test of CanNm_RepeatMessageRequest", Test_Of_CanNm_RepeatMessageRequest },   /* Format to { "nazwa testu", nazwa_funkcji } */
@@ -944,5 +929,4 @@ TEST_LIST = {
     { "Test of CanNm_TriggerTransmit", Test_Of_CanNm_TriggerTransmit },   /* Format to { "nazwa testu", nazwa_funkcji } */    
     { "Test of CanNm_MainFunction", Test_Of_CanNm_MainFunction },   /* Format to { "nazwa testu", nazwa_funkcji } */    
     { NULL, NULL }                                        /* To musi być na końcu */
-};
-    
+};   

@@ -95,6 +95,7 @@ Channels							1
     Kod funkcji
  \*====================================================================================================================*/
 
+
 /** @brief CanNm_Init [SWS_CanNm_00208]
  *
  * Initialize the CanNm module.
@@ -136,6 +137,7 @@ void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr) {
 	InitStatus = CANNM_STATUS_INIT;
 }
 
+
 /**
  * @brief CanNm_DeInit [SWS_CanNm_91002]
  *
@@ -162,6 +164,7 @@ void CanNm_DeInit(void){
 		//Nothing to do
 	}
 }
+
 
 /**
  * @brief CanNm_PassiveStartUp [SWS_CanNm_00211]
@@ -200,6 +203,7 @@ Std_ReturnType CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle)
 	}
 	return ret_val;
 }
+
 
 /**
  * @brief CanNm_NetworkRequest [SWS_CanNm_00213]
@@ -282,6 +286,7 @@ Std_ReturnType CanNm_NetworkRelease(NetworkHandleType nmChannelHandle)
 	return ret_val;
 }
 
+
 /**
  *  @brief CanNm_DisableCommunication [SWS_CanNm_00215]
  *
@@ -292,6 +297,7 @@ Std_ReturnType CanNm_NetworkRelease(NetworkHandleType nmChannelHandle)
 
 Std_ReturnType CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
 
+
 /**
  * @brief CanNm_EnableCommunication [SWS_CanNm_00216]
  *
@@ -300,6 +306,7 @@ Std_ReturnType CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
  * CanNmComControlEnabled = FALSE
  */
 Std_ReturnType CanNm_EnableCommunication(NetworkHandleType nmChannelHandle);
+
 
 /**
  * @brief CanNm_SetUserData [SWS_CanNm_00217]
@@ -331,6 +338,7 @@ Std_ReturnType CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8*
 	return ret_val;
 }
 
+
 /**
  * @brief CanNm_GetUserData [SWS_CanNm_00218]
  *
@@ -360,6 +368,7 @@ Std_ReturnType CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8* nmUse
 	}
 	return ret_val;
 }
+
 
 /**
  *  @brief CanNm_GetNodeIdentifier [SWS_CanNm_00219]
@@ -393,6 +402,7 @@ Std_ReturnType CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8*
 	return ret_val;
 }
 
+
 /**
  * @brief CanNm_GetLocalNodeIdentifier [SWS_CanNm_00220]
  *
@@ -416,6 +426,7 @@ Std_ReturnType CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, u
 	}
 	return ret_val;
 }
+
 
 /**
  * @brief CanNm_RepeatMessageRequest [SWS_CanNm_00221]
@@ -463,6 +474,7 @@ Std_ReturnType CanNm_RepeatMessageRequest(NetworkHandleType nmChannelHandle)
 	return ret_val;
 }
 
+
 /**
  * @brief CanNm_GetPduData [SWS_CanNm_00222]
  *
@@ -489,6 +501,7 @@ Std_ReturnType CanNm_GetPduData(NetworkHandleType nmChannelHandle, uint8* nmPduD
 	return ret_val;
 
 }
+
 
 /**
  * @brief CanNm_GetState [SWS_CanNm_00223]
@@ -518,6 +531,7 @@ Std_ReturnType CanNm_GetState(NetworkHandleType nmChannelHandle, Nm_StateType* n
 	return ret_val;
 }
 
+
 /**
  * @brief CanNm_GetVersionInfo [SWS_CanNm_00224]
  *
@@ -529,6 +543,7 @@ void CanNm_GetVersionInfo(Std_VersionInfoType* versioninfo)
 	CanNm_InternalType* ModuleInternal = &CanNm_Internal;
 	*versioninfo = ModuleInternal->VersionInfo;
 }
+
 
 /**
  * @brief CanNm_RequestBusSynchronization [SWS_CanNm_00226]
@@ -588,6 +603,7 @@ void CanNm_TxConfirmation(PduIdType TxPduId, Std_ReturnType result)
 		//Nothing to do
 	}
 }
+
 
 /**
  * @brief CanNm_RxIndication [SWS_CanNm_00231]
@@ -664,6 +680,7 @@ void CanNm_RxIndication(PduIdType RxPduId, const PduInfoType* PduInfoPtr)
 	}
 }
 
+
 /**
  * @brief CanNm_ConfirmPnAvailability [SWS_CanNm_00344]
  *
@@ -673,6 +690,7 @@ void CanNm_RxIndication(PduIdType RxPduId, const PduInfoType* PduInfoPtr)
  * CanNmGlobalPnSupport = FALSE
  */
 void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle);
+
 
 /**
  * @brief CanNm_TriggerTransmit [SWS_CanNm_91001]
@@ -697,6 +715,7 @@ Std_ReturnType CanNm_TriggerTransmit(PduIdType TxPduId, PduInfoType* PduInfoPtr)
 
 	return ret_val;
 }
+
 
 /**
  * @brief CanNm_MainFunction [SWS_CanNm_00234]
@@ -743,8 +762,6 @@ void CanNm_MainFunction(void){
 			{
 				if (CanNm_ConfigPtr->CanNmMainFunctionPeriod >= ModuleInternal->MessageCycleTimeLeft)
 				{
-					//TODO czemu tutaj najpierw przypisujemy 0, potem wartość?
-					ModuleInternal->MessageCycleTimeLeft = 0;/** [SWS_CanNm_00051] */
 					ModuleInternal->MessageCycleTimeLeft = CanNm_ConfigPtr->CanNmChannelConfig->CanNmMsgCycleTime;  /** [SWS_CanNm_00040] */
 					}
 				else
@@ -828,7 +845,6 @@ void CanNm_MainFunction(void){
 }
 
 
-
 /**
  * @brief Get user data offset byte index in NmPdu
  *
@@ -840,6 +856,7 @@ static inline PduLengthType CanNm_Internal_GetUserDataOffset( const CanNm_Config
     return userDataPos;
 }
 
+
 /**
  * @brief Get the pointer to user data location in NmPdu
  *
@@ -849,6 +866,7 @@ static inline uint8* CanNm_Internal_GetUserDataPtr( const CanNm_ConfigType* InCo
     return &MessageSduPtr[userDataOffset];
 }
 
+
 /**
  * @brief Get user data length
  *
@@ -857,4 +875,3 @@ static inline PduLengthType CanNm_Internal_GetUserDataLength( const CanNm_Config
 	PduLengthType userDataOffset = CanNm_Internal_GetUserDataOffset(InputConf);
     return InternalConf->PduLength - userDataOffset;
 }
-
