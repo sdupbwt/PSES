@@ -125,14 +125,14 @@ typedef struct {
 	Nm_ModeType Mode; /** [SWS_CanNm_00092] */
 	Nm_StateType State; /** [SWS_CanNm_00094] */
 	boolean Requested;
-    uint8 TxMessageSdu[8];
-    uint8 RxMessageSdu[8];
     PduLengthType PduLength;
     Std_VersionInfoType VersionInfo;
     float32 TimeoutTimeLeft;
     float32 RepeatMessageTimeLeft;
     float32 MessageCycleTimeLeft;
     float32 WaitBusSleepTimeLeft;
+    uint8 TxMessageSdu[8];
+    uint8 RxMessageSdu[8];
 } CanNm_InternalType;
 
 /*====================================================================================================================*\
@@ -193,8 +193,5 @@ Std_ReturnType CanNm_TriggerTransmit (PduIdType TxPduId, PduInfoType* PduInfoPtr
 
 void CanNm_MainFunction (void);
 
-
-//void Nm_NetworkMode(NetworkHandleType nmChannelHandle);
-//void Nm_NetworkStartIndication(NetworkHandleType NmNetworkHandle);
 
 #endif /* CANNM_H */

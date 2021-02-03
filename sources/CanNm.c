@@ -98,10 +98,11 @@ Channels							1
 
 /** @brief CanNm_Init [SWS_CanNm_00208]
  *
- * Initialize the CanNm module.
+ * Initialize the CanNm module.\n
  *
  */
-/** must be called directly after canIf */ /** [SWS_CanNm_00253] */
+
+/** Must be called directly after canIf */ /** [SWS_CanNm_00253] */
 void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr) {
 
 	CanNm_ConfigPtr = cannmConfigPtr;  /** [SWS_CanNm_00060] */
@@ -150,7 +151,7 @@ void CanNm_DeInit(void){
 	{
 		CanNm_InternalType* ModuleInternal = &CanNm_Internal;
 
-		if (ModuleInternal->State != NM_STATE_BUS_SLEEP);
+		if (ModuleInternal->State != NM_STATE_BUS_SLEEP){}
 
 		else
 		{
@@ -550,7 +551,7 @@ void CanNm_GetVersionInfo(Std_VersionInfoType* versioninfo)
  *
  * Request bus synchronization.
  *
- * CanNmBusSynchronizationEnabled = FALSE; - req CANNM280
+ * CanNmBusSynchronizationEnabled = FALSE;
  */
 Std_ReturnType CanNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle);
 
@@ -695,10 +696,10 @@ void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle);
 /**
  * @brief CanNm_TriggerTransmit [SWS_CanNm_91001]
  *
- * Within this API, the upper layer module (called module) shall check whether the available
- * data fits into the buffer size reported by PduInfoPtr->SduLength. If it fits, it shall copy
- * its data into the buffer provided by PduInfoPtr->SduDataPtr and update the length of the actual
- * copied data in PduInfoPtr->SduLength. If not, it returns E_NOT_OK without changing PduInfoPtr.
+ * Within this API, the upper layer module (called module) shall check whether the available\n
+ * data fits into the buffer size reported by PduInfoPtr->SduLength. If it fits, it shall copy\n
+ * its data into the buffer provided by PduInfoPtr->SduDataPtr and update the length of the actual\n
+ * copied data in PduInfoPtr->SduLength. If not, it returns E_NOT_OK without changing PduInfoPtr.\n
  */
 Std_ReturnType CanNm_TriggerTransmit(PduIdType TxPduId, PduInfoType* PduInfoPtr)
 {
