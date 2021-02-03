@@ -124,32 +124,37 @@ PduIdType RxPduId = 0;
 
 void Test_Of_CanNm_Init(void)
 {
-  ////////////////////////////////
-  // CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
-//  CanNm_ConfigPtrTest. CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
-
-  ///////////////////////////////  
-  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
-  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
-  CanNm_Init(&CanNm_ConfigPtrTest);
-
-  // TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
-  // // TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig.CanNmNodeId == 		CanNm_ConfigPtr->CanNmChannelConfig->CanNmTxPdu->TxPduRef->SduDataPtr[CanNm_ConfigPtr->CanNmChannelConfig->CanNmPduNidPosition]);
-
-  // ///////////////////////////////  
-  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 0;
-  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
-  CanNm_Init(&CanNm_ConfigPtrTest);
-
   ///////////////////////////////  
   CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
   CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_OFF;
   CanNm_Init(&CanNm_ConfigPtrTest);
+
+  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeId != 		CanNm_ConfigPtr->CanNmChannelConfig->CanNmTxPdu->TxPduRef->SduDataPtr[CanNm_ConfigPtr->CanNmChannelConfig->CanNmPduNidPosition]);
 
   ///////////////////////////////  
   CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = FALSE;
   CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_OFF;
   CanNm_Init(&CanNm_ConfigPtrTest);
+
+  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeId != 		CanNm_ConfigPtr->CanNmChannelConfig->CanNmTxPdu->TxPduRef->SduDataPtr[CanNm_ConfigPtr->CanNmChannelConfig->CanNmPduNidPosition]);
+
+  ///////////////////////////////  
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = FALSE;
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
+  CanNm_Init(&CanNm_ConfigPtrTest);
+
+  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeId != 		CanNm_ConfigPtr->CanNmChannelConfig->CanNmTxPdu->TxPduRef->SduDataPtr[CanNm_ConfigPtr->CanNmChannelConfig->CanNmPduNidPosition]);
+
+  ///////////////////////////////  
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeIdEnabled = 1;
+  CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
+  CanNm_Init(&CanNm_ConfigPtrTest);
+
+  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmNodeId == 		CanNm_ConfigPtr->CanNmChannelConfig->CanNmTxPdu->TxPduRef->SduDataPtr[CanNm_ConfigPtr->CanNmChannelConfig->CanNmPduNidPosition]);
 
 }
 
@@ -159,14 +164,14 @@ void Test_Of_CanNm_Init(void)
   Test function of CanNm_DeInit.
 */
 void Test_Of_CanNm_DeInit (void)
-{
+{  
   //////////////////////////////
-  InitStatus = CANNM_STATUS_INIT;
+  InitStatus = CANNM_STATUS_UNINIT;
   CanNm_Internal.State = NM_STATE_BUS_SLEEP;
 
   CanNm_DeInit();
 
-  TEST_CHECK(NM_STATE_UNINIT == CanNm_Internal.State);
+  TEST_CHECK(NM_STATE_UNINIT != CanNm_Internal.State);
   TEST_CHECK(CANNM_STATUS_UNINIT == InitStatus);
 
   //////////////////////////////
@@ -175,11 +180,17 @@ void Test_Of_CanNm_DeInit (void)
 
   CanNm_DeInit();
 
+  TEST_CHECK(NM_STATE_UNINIT != CanNm_Internal.State);
+  TEST_CHECK(CANNM_STATUS_UNINIT != InitStatus);
+
   //////////////////////////////
-  InitStatus = CANNM_STATUS_UNINIT;
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.State = NM_STATE_BUS_SLEEP;
 
   CanNm_DeInit();
-;
+
+  TEST_CHECK(NM_STATE_UNINIT == CanNm_Internal.State);
+  TEST_CHECK(CANNM_STATUS_UNINIT == InitStatus);
 }
 
 /**
@@ -190,42 +201,48 @@ void Test_Of_CanNm_DeInit (void)
 
 void Test_Of_CanNm_PassiveStartUp (void)
 {
-  Std_ReturnType result = E_NOT_OK;  
-  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
+  Std_ReturnType result = E_NOT_OK;
   
   /////////////////////////////////
-  ModuleInternal->Mode = NM_MODE_BUS_SLEEP;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
+  CanNm_Internal.State = NM_STATE_SYNCHRONIZE;
   CanNm_Init(&CanNm_ConfigPtrTest);
 
   result = CanNm_PassiveStartUp(nmChannelHandle);
 
   TEST_CHECK(E_OK == result);
-  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
   TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
   TEST_CHECK(NM_STATE_REPEAT_MESSAGE == CanNm_Internal.State);
 
   /////////////////////////////////
-  ModuleInternal->Mode = NM_MODE_PREPARE_BUS_SLEEP;
+  CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
+  CanNm_Internal.State = NM_STATE_SYNCHRONIZE;
   CanNm_Init(&CanNm_ConfigPtrTest);
 
   result = CanNm_PassiveStartUp(nmChannelHandle);
 
   TEST_CHECK(E_OK == result);
-  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
   TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
   TEST_CHECK(NM_STATE_REPEAT_MESSAGE == CanNm_Internal.State);
 
   ////////////////////////////////////////
-  ModuleInternal->Mode = NM_MODE_NETWORK;
+  CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
+  CanNm_Internal.State = NM_STATE_SYNCHRONIZE;
   result = CanNm_PassiveStartUp(nmChannelHandle);
 
-  TEST_CHECK(E_NOT_OK == result); 
+  TEST_CHECK(E_NOT_OK == result);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
 
   ////////////////////////////////////////
+  CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
+  CanNm_Internal.State = NM_STATE_SYNCHRONIZE;
   InitStatus = CANNM_STATUS_UNINIT;
   result = CanNm_PassiveStartUp(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);  
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
 }
 
 /**
@@ -236,34 +253,60 @@ void Test_Of_CanNm_PassiveStartUp (void)
 void Test_Of_CanNm_NetworkRequest (void)
 {
   Std_ReturnType result = E_NOT_OK;
-  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
 
   CanNm_Init(&CanNm_ConfigPtrTest);
 
+  /////////////////////////////////////////
   InitStatus = CANNM_STATUS_INIT; 
-  ModuleInternal->Mode = NM_MODE_BUS_SLEEP;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
+  CanNm_Internal.State = NM_STATE_SYNCHRONIZE;
+  CanNm_Internal.Requested = FALSE;
 
-/////////////////////////////////////////
   result = CanNm_NetworkRequest(nmChannelHandle);
 
   TEST_CHECK(E_OK == result);
-  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
   TEST_CHECK(TRUE == CanNm_Internal.Requested);
   TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
   TEST_CHECK(NM_STATE_REPEAT_MESSAGE == CanNm_Internal.State);
-  //TEST_CHECK(CANNM_CBV_ACTIVE_WAKEUP_BIT == CanNm_Internal.TxMessageSdu[CanNm_ConfigPtr->CanNmPduCbvPosition]);
 
-//////////////////////////////////////
-  ModuleInternal->Mode = NM_MODE_NETWORK;
+  /////////////////////////////////////////
+  InitStatus = CANNM_STATUS_INIT; 
+  CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
+  CanNm_Internal.State = NM_STATE_SYNCHRONIZE;
+  CanNm_Internal.Requested = FALSE;
+
+  result = CanNm_NetworkRequest(nmChannelHandle);
+
+  TEST_CHECK(E_OK == result);
+  TEST_CHECK(TRUE == CanNm_Internal.Requested);
+  TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE == CanNm_Internal.State);
+
+  //////////////////////////////////////
+  InitStatus = CANNM_STATUS_INIT; 
+  CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
+  CanNm_Internal.State = NM_STATE_SYNCHRONIZE;
+  CanNm_Internal.Requested = FALSE;
+
   result = CanNm_NetworkRequest(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);
-  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
-///////////////////////////////////////////
+  TEST_CHECK(TRUE == CanNm_Internal.Requested);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
+
+  ///////////////////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
+  CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
+  CanNm_Internal.State = NM_STATE_SYNCHRONIZE;
+  CanNm_Internal.Requested = FALSE;
+  
   result = CanNm_NetworkRequest(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);
+  TEST_CHECK(FALSE == CanNm_Internal.Requested);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
 }
 
 /**
@@ -274,13 +317,15 @@ void Test_Of_CanNm_NetworkRequest (void)
 void Test_Of_CanNm_NetworkRelease (void)
 {
   Std_ReturnType result = E_NOT_OK;
-  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
 
+  CanNm_Init(&CanNm_ConfigPtrTest);
+
+  /////////////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
-  ModuleInternal->Mode = NM_MODE_NETWORK;
-  ModuleInternal->State = NM_STATE_NORMAL_OPERATION;
-  
-/////////////////////////////////////////
+  CanNm_Internal.Mode = NM_MODE_NETWORK;
+  CanNm_Internal.State = NM_STATE_NORMAL_OPERATION;
+  CanNm_Internal.Requested = TRUE;
+
   result = CanNm_NetworkRelease(nmChannelHandle);
 
   TEST_CHECK(E_OK == result);
@@ -288,24 +333,44 @@ void Test_Of_CanNm_NetworkRelease (void)
   TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
   TEST_CHECK(NM_STATE_READY_SLEEP == CanNm_Internal.State);
 
-//////////////////////////////////////
-  ModuleInternal->State = NM_STATE_BUS_SLEEP;
+  //////////////////////////////////////
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_NETWORK;
+  CanNm_Internal.State = NM_STATE_BUS_SLEEP;
+  CanNm_Internal.Requested = TRUE;
+
   result = CanNm_NetworkRelease(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);
+  TEST_CHECK(FALSE == CanNm_Internal.Requested);
+  TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_READY_SLEEP != CanNm_Internal.State);
 
 //////////////////////////////////////
-  ModuleInternal->Mode = NM_MODE_BUS_SLEEP;
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
+  CanNm_Internal.State = NM_STATE_BUS_SLEEP;
+  CanNm_Internal.Requested = TRUE;
+
   result = CanNm_NetworkRelease(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);
-  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
+  TEST_CHECK(FALSE == CanNm_Internal.Requested);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_READY_SLEEP != CanNm_Internal.State);
 
 ///////////////////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
+  CanNm_Internal.State = NM_STATE_BUS_SLEEP;
+  CanNm_Internal.Requested = TRUE;
+
   result = CanNm_NetworkRelease(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);
+  TEST_CHECK(TRUE == CanNm_Internal.Requested);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_READY_SLEEP != CanNm_Internal.State);
 }
 
 /**
@@ -320,6 +385,7 @@ void Test_Of_CanNm_SetUserData (void)
 
   CanNm_Init(&CanNm_ConfigPtrTest);
 
+  /////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
 
   result = CanNm_SetUserData(nmChannelHandle, &nmUserDataPtr);
@@ -343,15 +409,18 @@ void Test_Of_CanNm_GetUserData (void)
 
   CanNm_Init(&CanNm_ConfigPtrTest);
 
+  /////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
 
   result = CanNm_GetUserData(nmChannelHandle, &nmUserDataPtr);
+
   TEST_CHECK(E_OK == result);  
 
   /////////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
 
   result = CanNm_GetUserData(nmChannelHandle, &nmUserDataPtr);
+
   TEST_CHECK(E_NOT_OK == result);
 }
 
@@ -363,30 +432,24 @@ void Test_Of_CanNm_GetUserData (void)
 
 void Test_Of_CanNm_GetNodeIdentifier (void)
 {
-  Std_ReturnType result =E_NOT_OK;
+  Std_ReturnType result = E_NOT_OK;
+  CanNm_Init(&CanNm_ConfigPtrTest);
 
-
-//////////////////////////////////
+  //////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_OFF;
-
-  CanNm_Init(&CanNm_ConfigPtrTest);
   
   result = CanNm_GetNodeIdentifier(nmChannelHandle, &nmNodeIdPtr);
 
   TEST_CHECK(E_NOT_OK == result);
-  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
 
   ///////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduNidPosition = CANNM_PDU_BYTE_0;
-
-  CanNm_Init(&CanNm_ConfigPtrTest);
   
   result = CanNm_GetNodeIdentifier(nmChannelHandle, &nmNodeIdPtr);
 
   TEST_CHECK(E_OK == result);
-  TEST_CHECK(CANNM_STATUS_INIT == InitStatus);
 
   /////////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
@@ -405,8 +468,8 @@ void Test_Of_CanNm_GetNodeIdentifier (void)
 void Test_Of_CanNm_GetLocalNodeIdentifier (void)
 {
   Std_ReturnType result = E_NOT_OK;
-
   CanNm_Init(&CanNm_ConfigPtrTest);
+
   ////////////////////////
   InitStatus = CANNM_STATUS_INIT;
 
@@ -431,14 +494,12 @@ void Test_Of_CanNm_GetLocalNodeIdentifier (void)
 void Test_Of_CanNm_RepeatMessageRequest (void)
 {
   Std_ReturnType result = E_NOT_OK;
-  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
-
   CanNm_Init(&CanNm_ConfigPtrTest);
 
   ////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
-  ModuleInternal->State = NM_STATE_NORMAL_OPERATION;
-  ModuleInternal->Mode = NM_MODE_NETWORK;
+  CanNm_Internal.State = NM_STATE_NORMAL_OPERATION;
+  CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
   
   result = CanNm_RepeatMessageRequest(nmChannelHandle);
 
@@ -448,72 +509,69 @@ void Test_Of_CanNm_RepeatMessageRequest (void)
 
   ////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
-  ModuleInternal->State = NM_STATE_NORMAL_OPERATION;
-  ModuleInternal->Mode = NM_MODE_PREPARE_BUS_SLEEP;
-  
-  result = CanNm_RepeatMessageRequest(nmChannelHandle);
-
-  TEST_CHECK(E_NOT_OK == result);
-
-  ////////////////////////////
-  InitStatus = CANNM_STATUS_INIT;
-  ModuleInternal->State = NM_STATE_NORMAL_OPERATION;
-  ModuleInternal->Mode = NM_MODE_BUS_SLEEP;
-  
-  result = CanNm_RepeatMessageRequest(nmChannelHandle);
-
-  TEST_CHECK(E_NOT_OK == result);
-  
-  ////////////////////////////
-  InitStatus = CANNM_STATUS_INIT;
-  ModuleInternal->State = NM_STATE_BUS_SLEEP;
-  
-  result = CanNm_RepeatMessageRequest(nmChannelHandle);
-
-  TEST_CHECK(E_NOT_OK == result);
-
-  ////////////////////////////
-  InitStatus = CANNM_STATUS_INIT;
-  ModuleInternal->Mode = NM_MODE_NETWORK;
-  ModuleInternal->State = NM_STATE_NORMAL_OPERATION;
+  CanNm_Internal.Mode = NM_MODE_NETWORK;
+  CanNm_Internal.State = NM_STATE_READY_SLEEP;
   
   result = CanNm_RepeatMessageRequest(nmChannelHandle);
 
   TEST_CHECK(E_OK == result);  
+  TEST_CHECK(NM_MODE_NETWORK == CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE == CanNm_Internal.State);
 
   ////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
-  ModuleInternal->Mode = NM_MODE_NETWORK;
-  ModuleInternal->State = NM_STATE_READY_SLEEP;
-  
-  result = CanNm_RepeatMessageRequest(nmChannelHandle);
-
-  TEST_CHECK(E_OK == result);  
-
-  ////////////////////////////
-  InitStatus = CANNM_STATUS_INIT;
-  ModuleInternal->Mode = NM_MODE_NETWORK;
-  ModuleInternal->State = NM_STATE_BUS_SLEEP;
+  CanNm_Internal.State = NM_STATE_NORMAL_OPERATION;
+  CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
   
   result = CanNm_RepeatMessageRequest(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
 
   ////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
-  // ModuleInternal->Mode = NM_STATE_REPEAT_MESSAGE;
-  ModuleInternal->State = NM_STATE_REPEAT_MESSAGE;
+  CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
   
   result = CanNm_RepeatMessageRequest(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE == CanNm_Internal.State);
+  
+  ////////////////////////////
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.State = NM_STATE_BUS_SLEEP;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
+  
+  result = CanNm_RepeatMessageRequest(nmChannelHandle);
+
+  TEST_CHECK(E_NOT_OK == result);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State); 
+
+  ////////////////////////////  
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
+  CanNm_Internal.State = NM_STATE_BUS_SLEEP;
+  
+  result = CanNm_RepeatMessageRequest(nmChannelHandle);
+
+  TEST_CHECK(E_NOT_OK == result);
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State); 
 
   ////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
+  CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
+  CanNm_Internal.State = NM_STATE_BUS_SLEEP;
   
   result = CanNm_RepeatMessageRequest(nmChannelHandle);
 
   TEST_CHECK(E_NOT_OK == result);   
+  TEST_CHECK(NM_MODE_NETWORK != CanNm_Internal.Mode);
+  TEST_CHECK(NM_STATE_REPEAT_MESSAGE != CanNm_Internal.State);
 
 }
 
@@ -525,19 +583,20 @@ void Test_Of_CanNm_RepeatMessageRequest (void)
 void Test_Of_CanNm_GetPduData (void)
 {
 	Std_ReturnType result = E_NOT_OK;
-
   CanNm_Init(&CanNm_ConfigPtrTest);
 
   //////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
 
   result = CanNm_GetPduData(nmChannelHandle,&nmPduDataPtr);
+
   TEST_CHECK(E_OK == result);
 
   //////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
 
   result = CanNm_GetPduData(nmChannelHandle,&nmPduDataPtr);
+  
   TEST_CHECK(E_NOT_OK == result);
 }
 
@@ -549,14 +608,12 @@ void Test_Of_CanNm_GetPduData (void)
 void Test_Of_CanNm_GetState (void)
 {
   Std_ReturnType result = E_NOT_OK;
-
-  CanNm_Internal.State = NM_STATE_PREPARE_BUS_SLEEP;
-  CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
-
   CanNm_Init(&CanNm_ConfigPtrTest);
 
   /////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.State = NM_STATE_PREPARE_BUS_SLEEP;
+  CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
 
   result = CanNm_GetState(nmChannelHandle, &nmStatePtr, &nmModePtr);
 
@@ -566,10 +623,14 @@ void Test_Of_CanNm_GetState (void)
 
   /////////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
+  CanNm_Internal.State = NM_STATE_BUS_SLEEP;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
 
   result = CanNm_GetState(nmChannelHandle, &nmStatePtr, &nmModePtr);
 
   TEST_CHECK(E_NOT_OK == result); 
+  TEST_CHECK(CanNm_Internal.State != nmStatePtr);
+  TEST_CHECK(CanNm_Internal.Mode != nmModePtr);
 
 }
 
@@ -580,12 +641,26 @@ void Test_Of_CanNm_GetState (void)
 */
 void Test_Of_CanNm_GetVersionInfo (void)
 {
-  Std_VersionInfoType versioninfo;
+  Std_VersionInfoType versioninfo = {
+    .vendorID = 5,
+    .moduleID = 1,
+    .sw_major_version = 1,
+    .sw_minor_version = 1,
+    .sw_patch_version = 1
+  };
+
+  Std_VersionInfoType VersioninfoTest = CanNm_Internal.VersionInfo;
 
   CanNm_Init(&CanNm_ConfigPtrTest);
+  
   CanNm_GetVersionInfo(&versioninfo);
 
-  // TEST_CHECK(CanNm_Internal.VersionInfo == versioninfo);
+
+  TEST_CHECK(CanNm_Internal.VersionInfo.vendorID == versioninfo.vendorID);
+  TEST_CHECK(CanNm_Internal.VersionInfo.moduleID == versioninfo.moduleID);
+  TEST_CHECK(CanNm_Internal.VersionInfo.sw_major_version == versioninfo.sw_major_version);
+  TEST_CHECK(CanNm_Internal.VersionInfo.sw_minor_version == versioninfo.sw_minor_version);
+  TEST_CHECK(CanNm_Internal.VersionInfo.sw_patch_version == versioninfo.sw_patch_version);
 }
 
 /**
@@ -603,30 +678,51 @@ void Test_Of_CanNm_TxConfirmation (void)
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   result = E_OK;
+  CanNm_Internal.TimeoutTimeLeft = 0;
 
   CanNm_TxConfirmation(TxPduId, result);
 
-  // TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig.CanNmMsgTimeoutTime == CanNm_Internal.TimeoutTimeLeft);
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmMsgTimeoutTime == CanNm_Internal.TimeoutTimeLeft);
 
   //////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
   result = E_NOT_OK;
+  CanNm_Internal.TimeoutTimeLeft = 0;
 
   CanNm_TxConfirmation(TxPduId, result);
+
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmMsgTimeoutTime != CanNm_Internal.TimeoutTimeLeft);
 
   //////////////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   result = E_NOT_OK;
+  CanNm_Internal.TimeoutTimeLeft = 0;
 
   CanNm_TxConfirmation(TxPduId, result);
+
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmMsgTimeoutTime != CanNm_Internal.TimeoutTimeLeft);  
+
+  //////////////////////////////////
+  InitStatus = CANNM_STATUS_INIT;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
+  result = E_OK;
+  CanNm_Internal.TimeoutTimeLeft = 0;
+
+  CanNm_TxConfirmation(TxPduId, result);
+
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmMsgTimeoutTime != CanNm_Internal.TimeoutTimeLeft);  
 
   //////////////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
+  CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
+  result = E_OK;
+  CanNm_Internal.TimeoutTimeLeft = 0;
 
   CanNm_TxConfirmation(TxPduId, result);
 
+  TEST_CHECK(CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmMsgTimeoutTime != CanNm_Internal.TimeoutTimeLeft); 
 }
 
 /**
@@ -636,7 +732,11 @@ void Test_Of_CanNm_TxConfirmation (void)
 */
 void Test_Of_CanNm_RxIndication (void)
 {
-  PduInfoType PduInfoPtrTest;
+  static uint8 PduInfoDataTest[CANNM_SDU_LENGTH];
+  PduInfoType PduInfoPtrTestRx = {
+  .SduDataPtr = PduInfoDataTest,
+  .SduLength = 1
+  };
   CanNm_Init(&CanNm_ConfigPtrTest);
 
   //////////////////////////
@@ -644,31 +744,31 @@ void Test_Of_CanNm_RxIndication (void)
   CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduCbvPosition = CANNM_PDU_BYTE_0;
   CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
 
-  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);
+  CanNm_RxIndication(RxPduId, &PduInfoPtrTestRx);
 
   //////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_ConfigPtrTest.CanNmChannelConfig->CanNmPduCbvPosition = CANNM_PDU_OFF;
   CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
 
-  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);
+  CanNm_RxIndication(RxPduId, &PduInfoPtrTestRx);
 
   //////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
 
-  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);  
+  CanNm_RxIndication(RxPduId, &PduInfoPtrTestRx);  
 
   //////////////////////////
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_SYNCHRONIZE;
 
-  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);  
+  CanNm_RxIndication(RxPduId, &PduInfoPtrTestRx);  
 
   //////////////////////////
   InitStatus = CANNM_STATUS_UNINIT;
 
-  CanNm_RxIndication(RxPduId, &PduInfoPtrTest);
+  CanNm_RxIndication(RxPduId, &PduInfoPtrTestRx);
 
 
 
@@ -684,21 +784,20 @@ void Test_Of_CanNm_RxIndication (void)
 void Test_Of_CanNm_TriggerTransmit (void)
 {
   Std_ReturnType result = E_NOT_OK;
-  PduInfoType PduInfoPtrTest2 = {
-    .SduLength = 1,
-    .SduDataPtr = 0
-  };
+  PduInfoType PduInfoPtrTestTx;
+  CanNm_InternalType* ModuleInternal = &CanNm_Internal;
+  uint16 Test = sizeof(ModuleInternal->TxMessageSdu);
 
   CanNm_Init(&CanNm_ConfigPtrTest);
 
   ///////////////////////////
-  // PduInfoPtrTest2.SduLength = sizeof(CanNm_Internal.TxMessageSdu);
-  result = CanNm_TriggerTransmit(TxPduId, &PduInfoPtrTest2);
+  PduInfoPtrTestTx.SduLength = Test;
+  result = CanNm_TriggerTransmit(TxPduId, &PduInfoPtrTestTx);
 
-  // TEST_CHECK(E_OK == result);
+  TEST_CHECK(E_OK == result);
 
   ///////////////////////////  
-  // PduInfoPtr.SduLength = sizeof(CanNm_Internal.TxMessageSdu) + 1;
+  PduInfoPtrTestTx.SduLength = Test + 1;
   result = CanNm_TriggerTransmit(TxPduId, &PduInfoPtr);
 
   TEST_CHECK(E_NOT_OK == result);
@@ -711,19 +810,17 @@ void Test_Of_CanNm_TriggerTransmit (void)
 */
 void Test_Of_CanNm_MainFunction (void)
 {
+  CanNm_Init(&CanNm_ConfigPtrTest);
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
-  CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod; // + 1;
+  CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
 
   CanNm_MainFunction();
-  
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
@@ -732,7 +829,6 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
@@ -741,7 +837,6 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.TimeoutTimeLeft = CanNm_ConfigPtrTest.CanNmMainFunctionPeriod;
@@ -750,7 +845,6 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
@@ -759,7 +853,6 @@ void Test_Of_CanNm_MainFunction (void)
    CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
@@ -770,7 +863,6 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
@@ -780,7 +872,6 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
@@ -790,7 +881,6 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_NETWORK;
   CanNm_Internal.State = NM_STATE_REPEAT_MESSAGE;
@@ -801,7 +891,6 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
   // CanNm_Internal.State = NM_STATE_NORMAL_OPERATION;
@@ -810,7 +899,6 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_PREPARE_BUS_SLEEP;
   // CanNm_Internal.State = NM_STATE_NORMAL_OPERATION;
@@ -819,16 +907,13 @@ void Test_Of_CanNm_MainFunction (void)
   CanNm_MainFunction();
 
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_INIT;
   CanNm_Internal.Mode = NM_MODE_BUS_SLEEP;
 
   CanNm_MainFunction();
 
 
-
   ///////////////////////////
-  CanNm_Init(&CanNm_ConfigPtrTest);
   InitStatus = CANNM_STATUS_UNINIT;
 
   CanNm_MainFunction();

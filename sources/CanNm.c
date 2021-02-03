@@ -36,7 +36,7 @@ CanNm_InitStatusType InitStatus = CANNM_STATUS_UNINIT;
 
 CanNm_InternalType CanNm_Internal = {
 	.PduLength = 8,
-	.TxMessageSdu = 0
+	.TxMessageSdu = {0,0,0,0,0,0,0,0}
 };
 
 static const CanNm_ConfigType* CanNm_ConfigPtr;
@@ -743,6 +743,7 @@ void CanNm_MainFunction(void){
 			{
 				if (CanNm_ConfigPtr->CanNmMainFunctionPeriod >= ModuleInternal->MessageCycleTimeLeft)
 				{
+					//TODO czemu tutaj najpierw przypisujemy 0, potem wartość?
 					ModuleInternal->MessageCycleTimeLeft = 0;/** [SWS_CanNm_00051] */
 					ModuleInternal->MessageCycleTimeLeft = CanNm_ConfigPtr->CanNmChannelConfig->CanNmMsgCycleTime;  /** [SWS_CanNm_00040] */
 					}
